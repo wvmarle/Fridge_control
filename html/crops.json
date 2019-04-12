@@ -1,0 +1,66 @@
+{"id": 1,
+"crop": "Kohlrabi",
+"description": "Kohlrabi is best known for it's bulbous stem, but also makes for a great microgreen. Mild in taste, it's similar to other brassicas.\nThis program produces microgreen.",
+"dark_days": 3,
+"total_days": 8,
+"misting": 8}
+
+{"id": 2,
+"crop": "Kohlrabi",
+"description": "Kohlrabi is best known for it's bulbous stem, but also makes for a great microgreen. Mild in taste, it's similar to other brassicas.\nThis program produces baby leaves.",
+"dark_days": 3,
+"total_days": 13,
+"misting": 8}
+
+{"id": 3,
+"crop": "Pea",
+"description": "Pea microgreens.\nThings to worry about: \n1) soak in water for a day before growing;\n2) need nutrients (use soil or add nutrients to coir).",
+"dark_days": 3,
+"total_days": 13,
+"misting": 8}
+
+{"id": 4,
+"crop": "Chard",
+"description": "Chard microgreens. Colourful stems and a beet-like flavour. Requires fertilisation.",
+"dark_days": 5,
+"total_days": 14,
+"misting": 8}
+
+{"id": 5,
+"crop": "Mizuna",
+"description": "Mizuna microgreens. Mustardy flavour. A mustard green in the brassica family.",
+"dark_days": 2,
+"total_days": 7,
+"misting": 8}
+
+{"id": 6,
+"crop": "Beet",
+"description": "Beet \"bull's blood\" microgreens. Deep red stems with red/green leaves, ",
+"dark_days": 7,
+"total_days": 16,
+"misting": 8}
+
+{"id": 7,
+"crop": "Mustard",
+"description": "Red mustard microgreens. Mild mustardy taste that increases in spiciness the older the plant gets.",
+"dark_days": 3,
+"total_days": 10,
+"misting": 8}
+
+{"id": 8,
+"crop": "Radish",
+"description": "Radish microgreens. A slight spicy tang, very similar to fully grown radishes. Bright red stems and deep green leaves.",
+"dark_days": 3,
+"total_days": 7,
+"misting": 8}
+
+{"id": 9,
+"crop": "Lettuce",
+"description": "Baby leaves, mixed lettuce.",
+"dark_days": 1,
+"total_days": 25,
+"misting": 8}
+  
+
+
+
