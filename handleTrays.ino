@@ -100,8 +100,10 @@ void handleTrays() {
               wateringTime[tray] = millis();
               waterFlowSensorTicks[tray] = 0;               // Look for backflow.
               mcp0.digitalWrite(PUMP_PIN[tray], LOW);       // Switch off the pump.
-//              trayInfo[tray].programState = PROGRAM_ERROR;  // Halt operation of this program: an error occurred.
+//              trayInfo[tray].programState = PROGRAM_ERROR; // Halt operation of this program: an error occurred.
 //              trayInfoChanged = true;
+            uint32_t interval = (24 / trayInfo[tray].wateringFrequency) * 60 * 60 * 1000; // The watering interval for this tray in milliseconds.
+            wateringTime[tray] = millis() - interval + 30 * 60 * 1000; // Try again in 30 minutes.
             }
             else {
               sprintf_P(buff, PSTR("Watering pump of tray %d is confirmed running."), tray + 1);
@@ -110,7 +112,7 @@ void handleTrays() {
             }
           }
           if (millis() - wateringTime[tray] > 15 * 60 * 1000) { // After pumping for 15 minutes we should be long done!
-            sprintf_P(buff, PSTR("After pumping for 15 minutes tray %d did not reach the required flow count. Stopping watering, halting program for this tray."), tray + 1);
+            sprintf_P(buff, PSTR("Watering 10: After pumping for 15 minutes tray %d did not reach the required flow count. Stopping watering, halting program for this tray."), tray + 1);
             logging.writeError(buff);
             wateringState[tray] = DRAINING;
             wateringTime[tray] = millis();
