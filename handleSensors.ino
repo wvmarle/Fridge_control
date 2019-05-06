@@ -6,11 +6,11 @@ void initSensors() {
   ECSensor.begin(&sensorData, &logging);
   pHSensor.begin(&sensorData, &logging);
   fertiliser.begin(&sensorData, &logging, &mcp0);
- #ifdef USE_DS1603L
+#ifdef USE_DS1603L
   waterLevelSensor.begin(&sensorData, &logging, &ds1603l);
- #elif defined (USE_HCSR04)
+#elif defined (USE_HCSR04)
   waterLevelSensor.begin(&sensorData, &logging);
- #endif
+#endif
 
 #elif defined(HYDROMONITOR_WILLIAMS_FRIDGE_V2_H)
   sensorSerial.begin(9600);
@@ -18,22 +18,22 @@ void initSensors() {
   ECSensor.begin(&sensorData, &logging);
   pHSensor.begin(&sensorData, &logging);
   fertiliser.begin(&sensorData, &logging, &mcp0);
- #ifdef USE_MPXV5004 
+#ifdef USE_WATERLEVEL_SENSOR
+#ifdef USE_MPXV5004
   waterLevelSensor.begin(&sensorData, &logging);
- #elif defined (USE_FLOATSWITCHES)
-  #if defined(FLOATSWITCH_HIGH_MCP17_PIN) || defined(FLOATSWITCH_MEDIUM_MCP17_PIN) || defined(FLOATSWITCH_LOW_MCP17_PIN)
+#elif defined (USE_FLOATSWITCHES)
+#if defined(FLOATSWITCH_HIGH_MCP17_PIN) || defined(FLOATSWITCH_MEDIUM_MCP17_PIN) || defined(FLOATSWITCH_LOW_MCP17_PIN)
   waterLevelSensor.begin(&sensorData, &logging, &mcp0);
-  #else
+#else
   waterLevelSensor.begin(&sensorData, &logging);
-  #endif
- #endif
- 
-  reservoir.begin(&sensorData, &logging, &mcp0, &waterLevelSensor);
- #ifdef USE_DS18B20
+#endif                                                      // Float switches pin type. 
+#endif                                                      // USE_FLOATSWITCHES
+#endif                                                      // USE_WATERLEVEL_SENSOR
+#ifdef USE_DS18B20
   waterTempSensor.begin(&sensorData, &logging, &ds18b20, &oneWire);
- #elif defined(USE_ISOLATED_SENSOR_BOARD)
+#elif defined(USE_ISOLATED_SENSOR_BOARD)
   waterTempSensor.begin(&sensorData, &logging);
- #endif
+#endif
 #endif
 }
 

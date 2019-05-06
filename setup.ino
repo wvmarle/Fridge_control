@@ -108,8 +108,13 @@ void setup() {
 
   fertiliser.begin(&sensorData, &logging, &mcp0);           // Fertiliser pumps.
   pHMinus.begin(&sensorData, &logging, &mcp0);              // pH minus pump.
+#ifdef USE_WATERLEVEL_SENSOR
   reservoir.begin(&sensorData, &logging, &mcp0, &waterLevelSensor); // Solenoid valve.
   drainage.begin(&sensorData, &logging, &mcp0, &waterLevelSensor); // Drainage pump & reservoir cleaning.
+#else
+  reservoir.begin(&sensorData, &logging, &mcp0);            // Solenoid valve.
+  drainage.begin(&sensorData, &logging, &mcp0);             // Drainage pump & reservoir cleaning.
+#endif
 
   // Set up the EEPROM memory (4096 bytes).
 #ifndef USE_24LC256_EEPROM

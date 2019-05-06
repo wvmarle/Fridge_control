@@ -105,6 +105,7 @@ void handleAPI() {
     sendSettingsJSON();
   }
 
+#ifdef USE_WATERLEVEL_SENSOR
   else if (request == F("max_water_level")) {
     waterLevelSensor.setMax();
     sendSettingsJSON();
@@ -114,6 +115,7 @@ void handleAPI() {
     waterLevelSensor.setZero();
     sendSettingsJSON();
   }
+#endif
 
   else if (request == F("set_program")) {
     if (server.hasArg(F("command")) &&
@@ -241,8 +243,10 @@ void sendSystemData() {
   server.sendContent(buff);
   sprintf_P(buff, PSTR("   \"waterTemp\":\"%.1f\",\n"), sensorData.waterTemp);
   server.sendContent(buff);
+#ifdef USE_WATERLEVEL_SENSOR
   sprintf_P(buff, PSTR("   \"waterLevel\":\"%.1f\",\n"), sensorData.waterLevel);
   server.sendContent(buff);
+#endif
   sprintf_P(buff, PSTR("   \"EC\":\"%.2f\",\n"), sensorData.EC);
   server.sendContent(buff);
   sprintf_P(buff, PSTR("   \"pH\":\"%.2f\",\n"), sensorData.pH);
@@ -251,8 +255,6 @@ void sendSystemData() {
   server.sendContent(buff);
   server.sendContent_P(PSTR("  },\n"
                             "  \"trayinfo\":{"));
-
-  //  char b[10];                                               // Buffer to hold numbers.
   for (uint8_t i = 0; i < TRAYS; i++) {
     if (i > 0) {
       server.sendContent_P(PSTR(","));

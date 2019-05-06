@@ -24,9 +24,11 @@ void initWebsite() {
   server.on("/measure_pump_phminus_speed", handlePumppHMinusSpeed);
   server.on("/drain_start", handleDrainStart);
   server.on("/drain_stop", handleDrainStop);
+#ifdef USE_WATERLEVEL_SENSOR
 #ifdef USE_MPXV5004
   server.on("/zero_reservoir_level", handleZeroReservoirLevel);
   server.on("/max_reservoir_level", handleMaxReservoirLevel);
+#endif
 #endif
   server.onNotFound(handleNotFound);
   server.begin();
@@ -399,6 +401,7 @@ void buttonHtml(uint8_t tray) {
   }
 }
 
+#ifdef USE_WATERLEVEL_SENSOR
 #ifdef USE_MPXV5004
 void handleZeroReservoirLevel() {
   waterLevelSensor.setZero();
@@ -409,4 +412,5 @@ void handleMaxReservoirLevel() {
   waterLevelSensor.setMax();
   handleSettings();
 }
+#endif
 #endif

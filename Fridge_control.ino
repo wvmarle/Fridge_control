@@ -17,8 +17,10 @@ ESP8266WiFiMulti wifiMulti;
 HydroMonitorECSensor ECSensor;
 #include <HydroMonitorWaterTempSensor.h>
 HydroMonitorWaterTempSensor waterTempSensor;
+#ifdef USE_WATERLEVEL_SENSOR
 #include <HydroMonitorWaterLevelSensor.h>
 HydroMonitorWaterLevelSensor waterLevelSensor;
+#endif
 #include <HydroMonitorpHSensor.h>
 HydroMonitorpHSensor pHSensor;
 #include <HydroMonitorDrainage.h>
@@ -28,7 +30,9 @@ HydroMonitorDrainage drainage;
 HydroMonitorSensorBase* sensors[] = {
   &ECSensor,
   &waterTempSensor,
+#ifdef USE_WATERLEVEL_SENSOR
   &waterLevelSensor,
+#endif
   &pHSensor,
 };
 uint8_t nSensors = 4;
