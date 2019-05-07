@@ -93,7 +93,7 @@ void handleCalibrateFlowsensors() {
 }
 
 void handleCalibrateFlowsensorsActionStart() {
-  uint8_t nArgs = server.args();                            // the number of arguments present. All arguments are expected to be key/value pairs.
+  uint8_t nArgs = server.args();                            // The number of arguments present. All arguments are expected to be key/value pairs.
   for (uint8_t i = 0; i < nArgs; i++) {                     // Read all the arguments that are present.
     if (server.argName(i) == F("flow_sensor")) {
       if (core.isNumeric(server.arg(i))) {

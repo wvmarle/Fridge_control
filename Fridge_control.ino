@@ -35,7 +35,11 @@ HydroMonitorSensorBase* sensors[] = {
 #endif
   &pHSensor,
 };
+#ifdef USE_WATERLEVEL_SENSOR
 uint8_t nSensors = 4;
+#else
+uint8_t nSensors = 3;
+#endif
 
 /***************************************************************************************************
    HydroMonitor library: the various other peripherals.
@@ -203,7 +207,6 @@ uint16_t wateringDuration[TRAYS];
 uint32_t wateringStartTime;
 uint16_t waterFlowSensorTicks[TRAYS];                       // Number of ticks this water flow sensor has recorded so far.
 uint32_t lastFlowCheckTime[TRAYS];                          // When we last checked for erroneous flow for this tray.
-
 
 enum WateringState {
   WATERING_IDLE,                                            // No watering happening now.

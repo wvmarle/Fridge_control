@@ -100,10 +100,10 @@ void handleTrays() {
               wateringTime[tray] = millis();
               waterFlowSensorTicks[tray] = 0;               // Look for backflow.
               mcp0.digitalWrite(PUMP_PIN[tray], LOW);       // Switch off the pump.
-//              trayInfo[tray].programState = PROGRAM_ERROR; // Halt operation of this program: an error occurred.
-//              trayInfoChanged = true;
-            uint32_t interval = (24 / trayInfo[tray].wateringFrequency) * 60 * 60 * 1000; // The watering interval for this tray in milliseconds.
-            wateringTime[tray] = millis() - interval + 30 * 60 * 1000; // Try again in 30 minutes.
+              //              trayInfo[tray].programState = PROGRAM_ERROR; // Halt operation of this program: an error occurred.
+              //              trayInfoChanged = true;
+              uint32_t interval = (24 / trayInfo[tray].wateringFrequency) * 60 * 60 * 1000; // The watering interval for this tray in milliseconds.
+              wateringTime[tray] = millis() - interval + 30 * 60 * 1000; // Try again in 30 minutes.
             }
             else {
               sprintf_P(buff, PSTR("Watering pump of tray %d is confirmed running."), tray + 1);
@@ -152,6 +152,13 @@ void handleTrays() {
           trayInfoChanged = true;
         }
       }
+      if (trayInfo[tray].programState == PROGRAM_PAUSED &&  // If the program has been paused
+          wateringState[tray] == WATERING) {                // during watering:
+        wateringState[tray] = DRAINING;                     // Set watering state to draining.
+        wateringTime[tray] = millis();
+        waterFlowSensorTicks[tray] = 0;                     // Look for backflow.
+        mcp0.digitalWrite(PUMP_PIN[tray], LOW);             // Switch off the pump.
+      }
 
       // Check the presence of the trays, and set the program state accordingly.
       if (bitRead(trayPresence, TRAY_PIN[tray]) == false) { // Tray not present, check for running program for this tray.
@@ -184,16 +191,16 @@ void handleTrays() {
     }
 
 
-//    // Calibration may be done for more than one tray at a time, or while programs are running.
-//    // Check whether any trays are watering/calibrating/draining, and set the lock bit accordingly.
-//    bool watering = false;
-//    for (uint8_t tray = 0; tray < TRAYS; tray++) {
-//      if (wateringState[tray] != WATERING_IDLE &&
-//          wateringState[tray] != WATERING_NEEDED) {
-//        watering = true;
-//        break;
-//      }
-//    }
-//    bitWrite(sensorData.systemStatus, STATUS_WATERING, watering);
+    //    // Calibration may be done for more than one tray at a time, or while programs are running.
+    //    // Check whether any trays are watering/calibrating/draining, and set the lock bit accordingly.
+    //    bool watering = false;
+    //    for (uint8_t tray = 0; tray < TRAYS; tray++) {
+    //      if (wateringState[tray] != WATERING_IDLE &&
+    //          wateringState[tray] != WATERING_NEEDED) {
+    //        watering = true;
+    //        break;
+    //      }
+    //    }
+    //    bitWrite(sensorData.systemStatus, STATUS_WATERING, watering);
   }
 }
