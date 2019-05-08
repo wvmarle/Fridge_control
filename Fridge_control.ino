@@ -231,7 +231,8 @@ const uint16_t TRAYINFO_EEPROM = FREE_EEPROM;
 const uint16_t FLOWSENSOR_COUNT_EEPROM = TRAYINFO_EEPROM + sizeof(trayInfo);
 
 // Fridge access point.
-const char* ap_ssid = "Fridge A";
+//const char* ap_ssid = "Fridge A";
+const char* ap_ssid = "Fridge B";
 const char* ap_password = "fridgewifi";
 
 #ifdef USE_OTA

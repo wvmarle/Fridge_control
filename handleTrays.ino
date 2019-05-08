@@ -190,17 +190,16 @@ void handleTrays() {
       }
     }
 
-
-    //    // Calibration may be done for more than one tray at a time, or while programs are running.
-    //    // Check whether any trays are watering/calibrating/draining, and set the lock bit accordingly.
-    //    bool watering = false;
-    //    for (uint8_t tray = 0; tray < TRAYS; tray++) {
-    //      if (wateringState[tray] != WATERING_IDLE &&
-    //          wateringState[tray] != WATERING_NEEDED) {
-    //        watering = true;
-    //        break;
-    //      }
-    //    }
-    //    bitWrite(sensorData.systemStatus, STATUS_WATERING, watering);
+    // Calibration may be done for more than one tray at a time, or while programs are running.
+    // Check whether any trays are watering/calibrating/draining, and set the lock bit accordingly.
+    bool watering = false;
+    for (uint8_t tray = 0; tray < TRAYS; tray++) {
+      if (wateringState[tray] != WATERING_IDLE &&
+          wateringState[tray] != WATERING_NEEDED) {
+        watering = true;
+        break;
+      }
+    }
+    bitWrite(sensorData.systemStatus, STATUS_WATERING, watering);
   }
 }
