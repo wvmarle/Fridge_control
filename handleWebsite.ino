@@ -64,7 +64,7 @@ void handleRoot() {
       uint8_t id;
       bool argsValid = true;
 
-      // Most commands have a tray parasensor; take care of that one here.
+      // Most commands have a tray parameter; take care of that one here.
       bool haveTray = false;
       for (uint8_t i = 0; i < nArgs; i++) {                 // Search for the tray number.
         if (keys[i] == F("tray")) {

@@ -251,42 +251,42 @@ void cropProgramHtml(uint8_t tray) {
 
 //********************************************************************************************************************
 // Take the datetime as seconds from epoch, convert to local time, and return a nicely formatted date & time string.
-void datetime(char* buff, time_t t) {
+void datetime(char* dt, time_t t) {
 
   if (t == 0 || t == -1) {
-    strcpy_P(buff, PSTR("n/a"));
+    strcpy_P(dt, PSTR("n/a"));
   }
   else {
     t += sensorData.timezone * 60 * 60;
-    sprintf_P(buff, PSTR("%04d/%02d/%02d %02d:%02d:%02d"), year(t), month(t), day(t), hour(t), minute(t), second(t));
+    sprintf_P(dt, PSTR("%04d/%02d/%02d %02d:%02d:%02d"), year(t), month(t), day(t), hour(t), minute(t), second(t));
   }
 }
 
 //********************************************************************************************************************
 // Get the current date and time, if available.
-void datetime(char* buff) {
+void datetime(char* dt) {
   if (timeStatus() != timeNotSet) {
-    datetime(buff, now());
+    datetime(dt, now());
   }
   else {
-    strcpy_P(buff, PSTR("n/a"));
+    strcpy_P(dt, PSTR("n/a"));
   }
 }
 
 //********************************************************************************************************************
 // Convert a number of seconds to days/hours, hours/minutes or just minutes.
-void daysHours(char* buff, time_t t) {
+void daysHours(char* b, time_t t) {
   if (t == 0 || t == -1) {
-    strcpy_P(buff, PSTR("n/a"));
+    strcpy_P(b, PSTR("n/a"));
   }
   if (day(t) - 1) {
-    sprintf_P(buff, PSTR("%02d days, %02d hours."), day(t) - 1, hour(t));
+    sprintf_P(b, PSTR("%02d days, %02d hours."), day(t) - 1, hour(t));
   }
   else if (hour(t)) {
-    sprintf_P(buff, PSTR("%02d hours, %02d mins."), hour(t), minute(t));
+    sprintf_P(b, PSTR("%02d hours, %02d mins."), hour(t), minute(t));
   }
   else {
-    sprintf_P(buff, PSTR("%02d mins."), minute(t));
+    sprintf_P(b, PSTR("%02d mins."), minute(t));
   }
 }
 

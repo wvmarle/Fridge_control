@@ -5,9 +5,6 @@
 void handleAPI() {
   String request = server.arg(F("request"));
 
-  Serial.print(F("Received API request: "));
-  Serial.println(request);
-
   // getdata: return all available sensor data as JSON string.
   if (request == F("get_data")) {
     sendSystemData();
@@ -317,6 +314,7 @@ void sendSystemData() {
   server.sendContent_P(PSTR("\n"
                             "  }\n"
                             "}"));
+  server.sendContent("");
 }
 
 void sendMessageLog() {
@@ -353,6 +351,7 @@ void sendCropList() {
   server.sendContent_P(PSTR("\n"
                             "  ]\n"
                             "}"));
+  server.sendContent("");
 }
 
 void sendSettingsJSON() {
@@ -380,5 +379,5 @@ void sendSettingsJSON() {
   }
   parameters.settingsJSON(&server);
   server.sendContent_P(PSTR("\n}"));
-  return;
+  server.sendContent("");
 }
