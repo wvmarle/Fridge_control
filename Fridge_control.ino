@@ -8,6 +8,7 @@
 #include <FS.h>
 #include <SoftwareSerial.h>
 #include <ESP8266WiFiMulti.h>
+#include <ESP8266mDNS.h>
 ESP8266WiFiMulti wifiMulti;
 
 /****************************************************************************************************
@@ -231,7 +232,9 @@ const uint16_t TRAYINFO_EEPROM = FREE_EEPROM;
 const uint16_t FLOWSENSOR_COUNT_EEPROM = TRAYINFO_EEPROM + sizeof(trayInfo);
 
 // Fridge access point.
+//const char* local_name = "fridgea";
 //const char* ap_ssid = "Fridge A";
+const char* local_name = "fridgeb";
 const char* ap_ssid = "Fridge B";
 const char* ap_password = "fridgewifi";
 

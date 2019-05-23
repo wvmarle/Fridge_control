@@ -152,6 +152,12 @@ void setup() {
     }
     wateringState[i] = WATERING_IDLE;
   }
+  if (!MDNS.begin("fridgeb")) {                            // Start the mDNS responder for local_name.local
+    Serial.println("Error setting up MDNS responder!");
+  }
+  else {
+    Serial.println("mDNS responder started");
+  }
 
 #ifdef HYDROMONITOR_WILLIAMS_FRIDGE_V1_H
   // Stop blinking the WiFi LED - by the time we're here, WiFi is connected and we're ready to go.
@@ -182,7 +188,7 @@ void MCP_init() {
 
   for (uint8_t i = 0; i < TRAYS; i++ ) {
     mcp1.pinMode(FLOW_PIN[i], INPUT);                       // The flow sensors.
-    mcp1.pullUp(FLOW_PIN[i], false);                        // Hall effect sensor: driven high/low.
+    mcp1.pullUp(FLOW_PIN[i], true);                         // Hall effect sensor: driven high/low.
     mcp1.pinMode(TRAY_PIN[i], INPUT);                       // The tray pins.
     mcp1.pullUp(TRAY_PIN[i], true);                         // Open collector output.
     mcp0.pinMode(PUMP_PIN[i], OUTPUT);                      // The water pumps.
