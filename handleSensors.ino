@@ -38,12 +38,8 @@ void initSensors() {
 }
 
 void readSensors() {
-  static uint32_t lastReadSensors;
-  if (millis() - lastReadSensor > REFRESH_SENSORS) {
-    lastReadSensor += REFRESH_SENSORS;
-    for (uint8_t i = 0; i < nSensors; i++) {
-      sensors[i]->readSensor();
-    }
+  for (uint8_t i = 0; i < nSensors; i++) {
+    sensors[i]->readSensor();
   }
 
   // Read the status of the flow sensors.

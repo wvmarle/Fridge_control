@@ -145,7 +145,6 @@ uint16_t trayPresence;                                      // 16 bits: presence
 uint8_t oldFlowSensorPins;                                  // 8 bits: stored status of the flow sensor pins.
 
 // The timing variables.
-uint32_t lastReadSensor = -REFRESH_SENSORS;
 uint32_t lastSendData = -REFRESH_DATABASE;
 uint32_t lastNtpUpdateTime = -REFRESH_NTP;
 bool updatingTime = false;

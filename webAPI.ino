@@ -3,225 +3,148 @@
   /api: this is communication from the app.
 */
 void handleAPI() {
-  String request = server.arg(F("request"));
+  uint8_t nArgs = server.args();                            // the number of arguments present. All arguments are expected to be key/value pairs.
+  if (nArgs > 0) {
+    Serial.print(F("Received API request with "));
+    Serial.print(nArgs);
+    Serial.print(F(" arguments, and request: "));
+    
+    String request = server.arg(F("request"));
 
-  // getdata: return all available sensor data as JSON string.
-  if (request == F("get_data")) {
-    sendSystemData();
-  }
+    Serial.println(request);
+    
+    // getdata: return all available sensor data as JSON string.
+    if (request == F("get_data")) {
+      sendSystemData();
+    }
 
-  else if (request == F("get_crop_data")) {
-    sendCropList();
-  }
+    else if (request == F("get_crop_data")) {
+      sendCropList();
+    }
 
-  // calibration: get calibration data of a specific sensor.
-  // Expect one argument: sensor, which is the name of one the sensor of which the data is requested.
-  else if (request == F("get_calibration")) {
-    String sensor = server.arg(F("sensor"));
-    if (sensor == F("ec")) {
-      ECSensor.getCalibration(&server);
-    }
-    else if (sensor == F("ph")) {
-      pHSensor.getCalibration(&server);
-    }
-    else {
-      server.send(200, F("text/plain"), F("Calibration api request received with invalid sensor."));
-    }
-  }
-
-  else if (request == F("do_calibration")) {
-    String sensor = server.arg(F("sensor"));
-    if (sensor == F("ec")) {
-      ECSensor.doCalibration(&server);
-      ECSensor.getCalibration(&server);
-    }
-    else if (sensor == F("ph")) {
-      pHSensor.doCalibration(&server);
-      pHSensor.getCalibration(&server);
-    }
-    else {
-      server.send(200, F("text/plain"), F("Calibration api request received with invalid sensor."));
-    }
-  }
-
-  else if (request == F("delete_calibration")) {
-    String sensor = server.arg(F("sensor"));
-    if (sensor == F("ec")) {
-      ECSensor.deleteCalibration(&server);
-      ECSensor.getCalibration(&server);
-    }
-    else if (sensor == F("ph")) {
-      pHSensor.deleteCalibration(&server);
-      pHSensor.getCalibration(&server);
-    }
-    else {
-      server.send(200, F("text/plain"), F("Calibration api request received with invalid sensor."));
-    }
-  }
-
-  else if (request == F("enable_calibration")) {
-    String sensor = server.arg(F("sensor"));
-    if (sensor == F("ec")) {
-      ECSensor.enableCalibration(&server);
-      ECSensor.getCalibration(&server);
-    }
-    else if (sensor == F("ph")) {
-      pHSensor.enableCalibration(&server);
-      pHSensor.getCalibration(&server);
-    }
-    else {
-      server.send(200, F("text/plain"), F("Calibration api request received with invalid sensor."));
-    }
-  }
-
-  // set_settings: set the various settings of a sensor.
-  // Can be handled by the general function. Respond with the (updated) settings as JSON object.
-  else if (request == F("set_settings")) {
-    setSettings();
-    sendSettingsJSON();
-  }
-
-  // get_settings: get the various settings of the system as JSON object.
-  else if (request == F("get_settings")) {
-    sendSettingsJSON();
-  }
-
-  // measure_pump_speed: run the indicated pump for 60 seconds, so the user can measure the flow
-  // of this pump.
-  else if (request == F("measure_pump_speed")) {
-    String pump = server.arg(F("pump"));
-    if (pump == F("pump_a")) {
-      fertiliser.measurePumpA();
-    }
-    if (pump == F("pump_b")) {
-      fertiliser.measurePumpB();
-    }
-    if (pump == F("pump_ph")) {
-      pHMinus.measurePump();
-    }
-    sendSettingsJSON();
-  }
-
-#ifdef USE_WATERLEVEL_SENSOR
-  else if (request == F("max_water_level")) {
-    waterLevelSensor.setMax();
-    sendSettingsJSON();
-  }
-
-  else if (request == F("zero_water_level")) {
-    waterLevelSensor.setZero();
-    sendSettingsJSON();
-  }
-#endif
-
-  else if (request == F("set_program")) {
-    if (server.hasArg(F("command")) &&
-        server.hasArg(F("tray")) &&
-        server.hasArg(F("crop"))) {
-      String command = server.arg(F("command"));
-      Serial.print(F("Command: \""));
-      Serial.print(command);
-      Serial.println(F("\""));
-      if (core.isNumeric(server.arg(F("tray"))) &&
-          core.isNumeric(server.arg(F("tray")))) {
-        uint8_t tray = server.arg(F("tray")).toInt();
-        uint8_t crop = server.arg(F("crop")).toInt();
-        Serial.print(F("Tray: "));
-        Serial.println(tray);
-        Serial.print(F("Crop: "));
-        Serial.println(crop);
-        if (tray < TRAYS && (crop < N_CROPS || crop == 255)) {
-          if (command == F("set")) {
-            if (trayInfo[tray].programState == PROGRAM_UNSET) {
-              trayInfo[tray].cropId = crop;
-              trayInfo[tray].programState = PROGRAM_SET;
-              trayInfoChanged = true;
-            }
-          }
-          else if (command == F("start")) {
-            if (trayInfo[tray].programState == PROGRAM_SET ||
-                trayInfo[tray].programState == PROGRAM_COMPLETE) {
-              if (trayInfo[tray].cropId == 255) {
-                // TODO: custom crop.
-              }
-              else {
-                trayInfo[tray].startTime = now();
-                trayInfo[tray].programState = PROGRAM_START;
-                trayInfoChanged = true;
-              }
-            }
-            else if (trayInfo[tray].programState == PROGRAM_UNSET &&
-                     crop > 0) {
-              trayInfo[tray].startTime = now();
-              trayInfo[tray].programState = PROGRAM_START;
-              trayInfo[tray].cropId = crop;
-              trayInfoChanged = true;
-            }
-          }
-          else if (command == F("pause")) {
-            Serial.println(trayInfo[tray].programState);
-            if (trayInfo[tray].programState == PROGRAM_RUNNING ||
-                trayInfo[tray].programState == PROGRAM_START ||
-                trayInfo[tray].programState == PROGRAM_START_WATERING) {
-              trayInfo[tray].programState = PROGRAM_PAUSED;
-              trayInfoChanged = true;
-              Serial.println(F("Paused."));
-            }
-          }
-          else if (command == F("resume")) {
-            if (trayInfo[tray].programState == PROGRAM_PAUSED ||
-                trayInfo[tray].programState == PROGRAM_ERROR) {
-              trayInfo[tray].programState = PROGRAM_RUNNING;
-              trayInfoChanged = true;
-            }
-          }
-          else if (command == F("reset")) {
-            trayInfo[tray].programState = PROGRAM_UNSET;
-            trayInfo[tray].cropId = 0;
-            trayInfo[tray].startTime = 0;
-#ifdef USE_GROWLIGHT
-            trayInfo[tray].darkDays = 0;
-#endif
-            trayInfo[tray].totalDays = 0;
-            trayInfo[tray].wateringFrequency = 0;
-            trayInfoChanged = true;
-            switch (wateringState[tray]) {
-              case WATERING_NEEDED:
-                wateringState[tray] = WATERING_IDLE;
-                break;
-
-              case WATERING:
-                wateringState[tray] = DRAINING;
-                wateringTime[tray] = millis();
-                break;
-            }
-          }
-        }
-        sendSystemData();
+    // calibration: get calibration data of a specific sensor.
+    // Expect one argument: sensor, which is the name of one the sensor of which the data is requested.
+    else if (request == F("get_calibration")) {
+      String sensor = server.arg(F("sensor"));
+      if (sensor == F("ec")) {
+        ECSensor.getCalibration(&server);
+      }
+      else if (sensor == F("ph")) {
+        pHSensor.getCalibration(&server);
+      }
+      else {
+        server.send(200, F("text/plain"), F("Calibration api request received with invalid sensor."));
       }
     }
-  }
-  else if (request == F("drainage_drain_now")) {
-    drainage.drainStart();
-    sendSettingsJSON();
-  }
-  else if (request == F("drainage_set_automatic")) {
-    drainage.drainStop();
-    sendSettingsJSON();
-  }
-  else if (request == F("get_flowsensor_calibration")) {
-    getFlowsensorCalibration();
-  }
-  else if (request == "start_flowsensor_calibration") {
-    handleCalibrateFlowsensorsActionStart();
-    getFlowsensorCalibration();
-  }
-  else if (request == F("stop_flowsensor_calibration")) {
-    handleCalibrateFlowsensorsActionStop();
-    getFlowsensorCalibration();
-  }
-  else if (request == F("get_message_log")) {
-    sendMessageLog();
+
+    else if (request == F("do_calibration")) {
+      String sensor = server.arg(F("sensor"));
+      if (sensor == F("ec")) {
+        ECSensor.doCalibration(&server);
+        ECSensor.getCalibration(&server);
+      }
+      else if (sensor == F("ph")) {
+        pHSensor.doCalibration(&server);
+        pHSensor.getCalibration(&server);
+      }
+      else {
+        server.send(200, F("text/plain"), F("Calibration api request received with invalid sensor."));
+      }
+    }
+
+    else if (request == F("delete_calibration")) {
+      String sensor = server.arg(F("sensor"));
+      if (sensor == F("ec")) {
+        ECSensor.deleteCalibration(&server);
+        ECSensor.getCalibration(&server);
+      }
+      else if (sensor == F("ph")) {
+        pHSensor.deleteCalibration(&server);
+        pHSensor.getCalibration(&server);
+      }
+      else {
+        server.send(200, F("text/plain"), F("Calibration api request received with invalid sensor."));
+      }
+    }
+
+    else if (request == F("enable_calibration")) {
+      String sensor = server.arg(F("sensor"));
+      if (sensor == F("ec")) {
+        ECSensor.enableCalibration(&server);
+        ECSensor.getCalibration(&server);
+      }
+      else if (sensor == F("ph")) {
+        pHSensor.enableCalibration(&server);
+        pHSensor.getCalibration(&server);
+      }
+      else {
+        server.send(200, F("text/plain"), F("Calibration api request received with invalid sensor."));
+      }
+    }
+
+    // set_settings: set the various settings of a sensor.
+    // Can be handled by the general function. Respond with the (updated) settings as JSON object.
+    else if (request == F("set_settings")) {
+      setSettings();
+      sendSettingsJSON();
+    }
+
+    // get_settings: get the various settings of the system as JSON object.
+    else if (request == F("get_settings")) {
+      sendSettingsJSON();
+    }
+
+    // measure_pump_speed: run the indicated pump for 60 seconds, so the user can measure the flow
+    // of this pump.
+    else if (request == F("measure_pump_speed")) {
+      String pump = server.arg(F("pump"));
+      if (pump == F("pump_a")) {
+        fertiliser.measurePumpA();
+      }
+      if (pump == F("pump_b")) {
+        fertiliser.measurePumpB();
+      }
+      if (pump == F("pump_ph")) {
+        pHMinus.measurePump();
+      }
+      sendSettingsJSON();
+    }
+#ifdef USE_WATERLEVEL_SENSOR
+    else if (request == F("max_water_level")) {
+      waterLevelSensor.setMax();
+      sendSettingsJSON();
+    }
+    else if (request == F("zero_water_level")) {
+      waterLevelSensor.setZero();
+      sendSettingsJSON();
+    }
+#endif
+    else if (request == F("set_program")) {
+      handleCropProgramRequest();
+      sendSystemData();
+    }
+    else if (request == F("drainage_drain_now")) {
+      drainage.drainStart();
+      sendSettingsJSON();
+    }
+    else if (request == F("drainage_set_automatic")) {
+      drainage.drainStop();
+      sendSettingsJSON();
+    }
+    else if (request == F("get_flowsensor_calibration")) {
+      getFlowsensorCalibration();
+    }
+    else if (request == "start_flowsensor_calibration") {
+      handleCalibrateFlowsensorsActionStart();
+      getFlowsensorCalibration();
+    }
+    else if (request == F("stop_flowsensor_calibration")) {
+      handleCalibrateFlowsensorsActionStop();
+      getFlowsensorCalibration();
+    }
+    else if (request == F("get_message_log")) {
+      sendMessageLog();
+    }
   }
 }
 
@@ -342,7 +265,7 @@ void sendCropList() {
       server.sendContent(crop.crop);
       server.sendContent_P(PSTR("\",\n"
                                 "     \"cropdescription\":\""));
-                                
+
       server.sendContent(core.urlencode(crop.description));
       server.sendContent_P(PSTR("\"\n"
                                 "    }"));

@@ -6,15 +6,31 @@ void loop() {
 #endif
 
   // Check for incoming http connections.
+  uint32_t startLoop = millis();
   server.handleClient();
-  
+//  Serial.print(millis() - startLoop);
+//  Serial.print(" ... ");
   fertiliser.doFertiliser();
+//  Serial.print(millis() - startLoop);
+//  Serial.print(" ... ");
   pHMinus.dopH();
+//  Serial.print(millis() - startLoop);
+//  Serial.print(" ... ");
   reservoir.doReservoir();
+//  Serial.print(millis() - startLoop);
+//  Serial.print(" ... ");
   drainage.doDrainage();
+//  Serial.print(millis() - startLoop);
+//  Serial.print(" ... ");
   readSensors();
+//  Serial.print(millis() - startLoop);
+//  Serial.print(" ... ");
   handleTrays();
+//  Serial.print(millis() - startLoop);
+//  Serial.print(" ... ");
   logging.logData();
+//  Serial.print(millis() - startLoop);
+//  Serial.println();
 
   // Every REFRESH_NTP seconds: update the time.
   if (millis() - lastNtpUpdateTime > REFRESH_NTP) {

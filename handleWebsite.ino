@@ -36,119 +36,11 @@ void initWebsite() {
 
 void handleRoot() {
 
-  uint8_t nArgs = server.args();                            // the number of arguments present. All arguments are expected to be key/value pairs.
-  bool returnHome = true;
-
   // If we have arguments, handle that here.
-  if (nArgs > 0) {
-    String command = "";
-    String keys[nArgs];
-    uint32_t values[nArgs];
-
-    // Parse the arguments, and to a first sanity check on them.
-    // All values except the command are numerical, handle as such and command separately.
-    for (uint8_t i = 0; i < nArgs; i++) {
-      values[i] = 0;
-      keys[i] = server.argName(i);
-
-      // All arguments are an integer value, except the command which is handled separately.
-      if (keys[i] != F("command")) {
-        values[i] = server.arg(i).toInt();
-      }
-      else {
-        command = server.arg(i);                            // The command of this query.
-      }
-    }
-    if (command != "") {                                    // Must have a command for a valid query!
-      uint8_t tray;
-      uint8_t id;
-      bool argsValid = true;
-
-      // Most commands have a tray parameter; take care of that one here.
-      bool haveTray = false;
-      for (uint8_t i = 0; i < nArgs; i++) {                 // Search for the tray number.
-        if (keys[i] == F("tray")) {
-          if (values[i] >= TRAYS) {                         // Invalid tray number given, invalidate arguments.
-            argsValid = false;
-            break;
-          }
-          tray = values[i];
-          haveTray = true;
-          break;
-        }
-      }
-      if (argsValid) {
-
-        // command set_crop
-        if (command == F("set_crop") && haveTray) {         // Set a new crop for a specific tray.
-          getProgramData(keys, values, nArgs, &id, tray, &argsValid);
-          if (argsValid) {
-            trayInfo[tray].cropId = id;
-            trayInfo[tray].programState = PROGRAM_SET;
-            trayInfoChanged = true;
-          }
-        }
-        // Command start.
-        if (command == F("start") &&
-            (trayInfo[tray].programState == PROGRAM_SET ||
-             trayInfo[tray].programState == PROGRAM_COMPLETE)) {
-          if (trayInfo[tray].cropId == 255) {
-            getProgramData(keys, values, nArgs, &id, tray, &argsValid); // Custom program comes with extra parameters for the crop program.
-          }
-          if (argsValid) {
-            trayInfo[tray].startTime = now();
-            trayInfo[tray].programState = PROGRAM_START;
-            trayInfoChanged = true;
-          }
-        }
-
-        // Command resume.
-        if (command == F("resume") &&
-            (trayInfo[tray].programState == PROGRAM_PAUSED ||
-             trayInfo[tray].programState == PROGRAM_ERROR)) {
-          trayInfo[tray].programState = PROGRAM_RUNNING;
-          trayInfoChanged = true;
-        }
-
-        // Command stop.
-        if (command == F("stop") &&
-            (trayInfo[tray].programState == PROGRAM_RUNNING ||
-             trayInfo[tray].programState == PROGRAM_START ||
-             trayInfo[tray].programState == PROGRAM_START_WATERING)) {
-          trayInfo[tray].programState = PROGRAM_PAUSED;
-          trayInfoChanged = true;
-        }
-
-        // Command reset
-        if (command == F("reset")) {
-          trayInfo[tray].programState = PROGRAM_UNSET;
-          trayInfo[tray].cropId = 0;
-          trayInfo[tray].startTime = 0;
-#ifdef USE_GROWLIGHT
-          trayInfo[tray].darkDays = 0;
-#endif
-          trayInfo[tray].totalDays = 0;
-          trayInfo[tray].wateringFrequency = 0;
-          trayInfoChanged = true;
-          switch (wateringState[tray]) {
-            case WATERING_NEEDED:
-              wateringState[tray] = WATERING_IDLE;
-              break;
-
-            case WATERING:
-              wateringState[tray] = DRAINING;
-              wateringTime[tray] = millis();
-              break;
-          }
-        }
-      }
-    }
+  if (server.args() > 0) {
+    handleCropProgramRequest();
   }
 
-  // Any incoming arguments have been taken care of. Return the landing page, if needed, with all important details of the device status.
-  if (!returnHome) {
-    return;
-  }
   network.htmlResponse(&server);
   network.htmlPageHeader(&server, false);
   server.sendContent_P(PSTR("<p>Current time: "));
@@ -283,7 +175,7 @@ void handleRoot() {
     server.sendContent_P(PSTR("\n\
           </td>\n\
           <td>\n"));
-    buttonHtml(i);                                          // One or more buttons to start/stop/interrupt/etc. programs.
+    buttonHtml(i);                                          // One or more buttons to start/pause/reset/resume programs.
     server.sendContent_P(PSTR("\
           </td>\n\
         </tr>\n\
@@ -337,6 +229,120 @@ void handleRoot() {
   network.htmlPageFooter(&server);
 }
 
+void handleCropProgramRequest() {
+  uint8_t nArgs = server.args();                            // the number of arguments present. All arguments are expected to be key/value pairs.
+  String command = "";
+  String keys[nArgs];
+  uint32_t values[nArgs];
+
+  // Parse the arguments, and do a first sanity check on them.
+  // All values except the command are numerical, handle as such and command separately.
+  for (uint8_t i = 0; i < nArgs; i++) {
+    values[i] = 0;
+    keys[i] = server.argName(i);
+
+    // All arguments are an integer value, except the command which is handled separately.
+    if (keys[i] != F("command")) {
+      values[i] = server.arg(i).toInt();
+    }
+    else {
+      command = server.arg(i);                            // The command of this query.
+    }
+  }
+  if (command != "") {                                    // Must have a command for a valid query!
+    uint8_t tray;
+    uint8_t id;
+    bool argsValid = true;
+
+    // Most commands have a tray parameter; take care of that one here.
+    bool haveTray = false;
+    for (uint8_t i = 0; i < nArgs; i++) {                 // Search for the tray number.
+      if (keys[i] == F("tray")) {
+        if (values[i] >= TRAYS) {                         // Invalid tray number given, invalidate arguments.
+          argsValid = false;
+          break;
+        }
+        tray = values[i];
+        haveTray = true;
+        break;
+      }
+    }
+    if (argsValid) {
+
+      // command set_crop
+      if (command == F("set_crop") &&
+          haveTray &&
+          trayInfo[tray].programState == PROGRAM_UNSET) {         // Set a new crop for a specific tray.
+        getProgramData(keys, values, nArgs, &id, tray, &argsValid);
+        if (argsValid) {
+          trayInfo[tray].cropId = id;
+          trayInfo[tray].programState = PROGRAM_SET;
+          trayInfoChanged = true;
+        }
+      }
+      // Command start.
+      if (command == F("start") &&
+          haveTray &&
+          (trayInfo[tray].programState == PROGRAM_UNSET ||
+           trayInfo[tray].programState == PROGRAM_SET ||
+           trayInfo[tray].programState == PROGRAM_COMPLETE)) {
+        Serial.println(F("Got command start."));
+        if (trayInfo[tray].cropId == 255 ||                           // Custom program comes with extra parameters for the crop program.
+            trayInfo[tray].programState == PROGRAM_UNSET) {           // If tray is still unset: expect to get the cropId in the arguments (it comes from the app like this).
+          getProgramData(keys, values, nArgs, &id, tray, &argsValid);
+          Serial.print(F("Got crop ID: "));
+          Serial.println(id);
+          trayInfo[tray].cropId = id;
+        }
+        if (argsValid) {
+          trayInfo[tray].startTime = now();
+          trayInfo[tray].programState = PROGRAM_START;
+          trayInfoChanged = true;
+        }
+      }
+
+      // Command resume.
+      if (command == F("resume") &&
+          (trayInfo[tray].programState == PROGRAM_PAUSED ||
+           trayInfo[tray].programState == PROGRAM_ERROR)) {
+        trayInfo[tray].programState = PROGRAM_RUNNING;
+        trayInfoChanged = true;
+      }
+
+      // Command pause.
+      if (command == F("pause") &&
+          (trayInfo[tray].programState == PROGRAM_RUNNING ||
+           trayInfo[tray].programState == PROGRAM_START ||
+           trayInfo[tray].programState == PROGRAM_START_WATERING)) {
+        trayInfo[tray].programState = PROGRAM_PAUSED;
+        trayInfoChanged = true;
+      }
+
+      // Command reset
+      if (command == F("reset")) {
+        trayInfo[tray].programState = PROGRAM_UNSET;
+        trayInfo[tray].cropId = 0;
+        trayInfo[tray].startTime = 0;
+#ifdef USE_GROWLIGHT
+        trayInfo[tray].darkDays = 0;
+#endif
+        trayInfo[tray].totalDays = 0;
+        trayInfo[tray].wateringFrequency = 0;
+        trayInfoChanged = true;
+        switch (wateringState[tray]) {
+          case WATERING_NEEDED:
+            wateringState[tray] = WATERING_IDLE;
+            break;
+
+          case WATERING:
+            wateringState[tray] = DRAINING;
+            wateringTime[tray] = millis();
+            break;
+        }
+      }
+    }
+  }
+}
 
 /***********************************************************************************************************
   Any unknown request is handled here.
@@ -378,7 +384,7 @@ void buttonHtml(uint8_t tray) {
     case PROGRAM_START:
     case PROGRAM_START_WATERING:
       server.sendContent_P(PSTR("\n\
-          <button type=\"submit\" name=\"command\" value=\"stop\">Pause</button>\n\
+          <button type=\"submit\" name=\"command\" value=\"pause\">Pause</button>\n\
           &nbsp;\n"));
       break;
     case PROGRAM_PAUSED:
