@@ -53,7 +53,7 @@ HydroMonitorpHMinus pHMinus;
 HydroMonitorReservoir reservoir;
 
 /***************************************************************************************************
-   HydroMonitor library: the newtorking functions.
+   HydroMonitor library: the networking functions.
 */
 #include <HydroMonitorNetwork.h>
 HydroMonitorNetwork network;
