@@ -13,7 +13,7 @@ void initSensors() {
 #endif
 
 #elif defined(HYDROMONITOR_WILLIAMS_FRIDGE_V2_H)
-  sensorSerial.begin(9600);
+  sensorSerial.begin(2400);
   isolatedSensorBoard.begin(&sensorData, &logging, &sensorSerial);
   ECSensor.begin(&sensorData, &logging);
   pHSensor.begin(&sensorData, &logging);
@@ -40,6 +40,7 @@ void initSensors() {
 void readSensors() {
   for (uint8_t i = 0; i < nSensors; i++) {
     sensors[i]->readSensor();
+    yield();
   }
 
   // Read the status of the flow sensors.

@@ -5,13 +5,13 @@
 void handleAPI() {
   uint8_t nArgs = server.args();                            // the number of arguments present. All arguments are expected to be key/value pairs.
   if (nArgs > 0) {
+    String request = server.arg(F("request"));
+
     Serial.print(F("Received API request with "));
     Serial.print(nArgs);
     Serial.print(F(" arguments, and request: "));
-    
-    String request = server.arg(F("request"));
-
     Serial.println(request);
+    uint32_t startMillis = millis();
     
     // getdata: return all available sensor data as JSON string.
     if (request == F("get_data")) {
@@ -145,6 +145,10 @@ void handleAPI() {
     else if (request == F("get_message_log")) {
       sendMessageLog();
     }
+
+    Serial.print(F("API call completed. Time taken: "));
+    Serial.print(millis() - startMillis);
+    Serial.println(F(" ms."));
   }
 }
 

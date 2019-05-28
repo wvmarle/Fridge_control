@@ -160,7 +160,7 @@ enum ProgramState {
   PROGRAM_PAUSED,                                           // Program on hold - no lights, no watering.
   PROGRAM_ERROR                                             // Program on hold - error detected.
 };
-                                                            
+
 // Possibilities for the watering frequency, in times daily.
 const uint8_t N_FREQUENCIES = 8;
 const uint8_t WATERING_FREQUENCIES[] = {0, 1, 2, 3, 4, 6, 8, 12};
@@ -184,7 +184,7 @@ bool trayInfoChanged;
 struct Crop {
   uint8_t id;
   char crop[32];
-  char description[512];
+  char description[201];
   uint8_t darkDays;                                         // The number of days the tray remains dark.
   uint8_t totalDays;                                        // The number of days the program is to run.
   uint16_t wateringFrequency;                               // The interval between two mistings in minutes.

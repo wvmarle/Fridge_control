@@ -8,29 +8,21 @@ void loop() {
   // Check for incoming http connections.
   uint32_t startLoop = millis();
   server.handleClient();
-//  Serial.print(millis() - startLoop);
-//  Serial.print(" ... ");
+  yield();
   fertiliser.doFertiliser();
-//  Serial.print(millis() - startLoop);
-//  Serial.print(" ... ");
+  yield();
   pHMinus.dopH();
-//  Serial.print(millis() - startLoop);
-//  Serial.print(" ... ");
+  yield();
   reservoir.doReservoir();
-//  Serial.print(millis() - startLoop);
-//  Serial.print(" ... ");
+  yield();
   drainage.doDrainage();
-//  Serial.print(millis() - startLoop);
-//  Serial.print(" ... ");
+  yield();
   readSensors();
-//  Serial.print(millis() - startLoop);
-//  Serial.print(" ... ");
+  yield();
   handleTrays();
-//  Serial.print(millis() - startLoop);
-//  Serial.print(" ... ");
+  yield();
   logging.logData();
-//  Serial.print(millis() - startLoop);
-//  Serial.println();
+  yield();
 
   // Every REFRESH_NTP seconds: update the time.
   if (millis() - lastNtpUpdateTime > REFRESH_NTP) {
@@ -50,4 +42,13 @@ void loop() {
 #endif
     trayInfoChanged = false;
   }
+//  yield();
+//  static uint32_t freeHeap;
+//  static uint32_t previousFreeHeap;
+//  freeHeap = ESP.getFreeHeap();
+//  if (freeHeap != previousFreeHeap) {
+//    Serial.print(F("Heap changed! Current free heap: "));
+//    Serial.println(freeHeap);
+//    previousFreeHeap = freeHeap;
+//  }
 }

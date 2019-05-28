@@ -1,5 +1,8 @@
 //********************************************************************************************************************
 // Read the data of the crop given by the id.
+//
+// NOTE: the json file is read in one go, and should not be larger than 320 bytes.
+//
 Crop getCropData(uint8_t id) {
   Crop crop;
   sprintf_P(buff, PSTR("/%d.json"), id);                    // The file name should be the id number with .json extension.
@@ -9,9 +12,14 @@ Crop getCropData(uint8_t id) {
     return crop;
   }
   uint16_t s = f.size();
+  if (s > 320) {
+    crop.id = 0;
+    return crop;
+  }
   char json[s + 1];
   f.read((uint8_t*)json, s);
   json[s] = 0;                                              // null terminator.
+
   StaticJsonBuffer<600> jsonBuffer;                         // Create a buffer big enough to contain the complete file.
   JsonObject& root = jsonBuffer.parseObject(json);
   if (!root.success()) {                                    // Invalid json format.
@@ -20,7 +28,7 @@ Crop getCropData(uint8_t id) {
   }
   crop.id = id;
   strlcpy(crop.crop, root["crop"], 32);
-  strlcpy(crop.description, root["description"], 512);
+  strlcpy(crop.description, root["description"], 201);
   crop.darkDays = root["dark_days"];
   crop.totalDays = root["total_days"];
   crop.wateringFrequency = root["watering"];

@@ -8,11 +8,12 @@ E24LC256 EXTERNAL_EEPROM(0x50);
 #define USE_SERIAL
 
 void setup() {
-
-  //  Serial.begin(9600);                                       // DS1603LSensor transmits its data at 9600 bps.
+#ifdef USE_DS1603L
+  Serial.begin(9600);                                       // DS1603LSensor transmits its data at 9600 bps.
+#elif defined(USE_SERIAL)
   Serial.begin(115200);
-
-  MCP_init();                                                   // Set up the port extenders.
+#endif
+  MCP_init();                                               // Set up the port extenders.
 
 #ifdef HYDROMONITOR_WILLIAMS_FRIDGE_V1_H
   os_timer_setfn(&blinkTimer, blinkTimerCallback, NULL);
@@ -23,15 +24,17 @@ void setup() {
   sensorData.EEPROM = &EXTERNAL_EEPROM;
 #endif
 
-  mcp0.digitalWrite(AUX1_MCP17_PIN, HIGH);
+#ifdef HYDROMONITOR_WILLIAMS_FRIDGE_V2_H
+  mcp0.digitalWrite(AUX1_MCP17_PIN, HIGH);                  // Reset the port extenders.
   delay(500);
   mcp0.digitalWrite(AUX1_MCP17_PIN, LOW);
+#endif
 
   core.begin(&sensorData);
   logging.begin(&sensorData);
 
   // Network details.
-  WiFi.mode(WIFI_AP_STA);                                   // Allow to act as station and accses point.
+  WiFi.mode(WIFI_AP_STA);                                   // Act as station and accses point.
   wifiMulti.addAP("Squirrel", "AcornsAreYummie");
   wifiMulti.addAP("Bustling City Tours", "bustlingcity");
 
@@ -63,7 +66,6 @@ void setup() {
   IPAddress gateway(192, 168, 4, 1);
   IPAddress subnet(255, 255, 255, 0);
   WiFi.softAPConfig(local_IP, gateway, subnet);
-
 
 #ifdef USE_OTA
   /* BEGIN OTA (part 2 of 3) */
@@ -138,6 +140,7 @@ void setup() {
   EEPROM.get(TRAYINFO_EEPROM, trayInfo);
   EEPROM.get(FLOWSENSOR_COUNT_EEPROM, flowSensorCount);
 #endif
+
   // Check wether we have valid data in the tray info - if not reset this tray.
   for (uint8_t i = 0; i < TRAYS; i++) {
     if (isValidFrequency(trayInfo[i].wateringFrequency) == false) {
@@ -152,7 +155,7 @@ void setup() {
     }
     wateringState[i] = WATERING_IDLE;
   }
-  if (!MDNS.begin("fridgeb")) {                            // Start the mDNS responder for local_name.local
+  if (!MDNS.begin("fridgeb")) {                             // Start the mDNS responder for local_name.local
     Serial.println("Error setting up MDNS responder!");
   }
   else {

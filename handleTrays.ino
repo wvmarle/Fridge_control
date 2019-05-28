@@ -188,6 +188,7 @@ void handleTrays() {
             break;
         }
       }
+      yield();
     }
 
     // Calibration may be done for more than one tray at a time, or while programs are running.

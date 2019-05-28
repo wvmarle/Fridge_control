@@ -21,7 +21,7 @@ void setup() {
 #ifdef DEBUG
   Serial.begin(115200);
 #endif
-  mySerial.begin(9600);
+  mySerial.begin(2400);                                     // Nice and slow or the ESP8266 can't follow...
   initECSensor();
   initpHSensor();
 //  initTemperatureSensor();
@@ -61,7 +61,8 @@ void loop() {
     ECReading = readECSensor();
     char s[22];
 //    sprintf_P(s, PSTR("<E%d,T%d,P%d>"), int(ECReading), int(temperature * 10), pHReading);
-    sprintf_P(s, PSTR("<E%d,T%d,P%d>"), int(ECReading), 0, pHReading);
+//    sprintf_P(s, PSTR("<E%d,T%d,P%d>"), int(ECReading), 0, pHReading);
+    sprintf_P(s, PSTR("<E%d,P%d>"), int(ECReading), pHReading);
 #ifdef DEBUG
     Serial.print(F("Test: "));
     Serial.print(i++);

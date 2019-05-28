@@ -225,7 +225,6 @@ void handleRoot() {
     <p><a href=\"/settings\">Settings</a></p>\
     <p><a href=\"/calibrate_flowsensors\">Calibrate flow sensors</a></p>\
   </body></html>"));
-
   network.htmlPageFooter(&server);
 }
 
@@ -246,19 +245,19 @@ void handleCropProgramRequest() {
       values[i] = server.arg(i).toInt();
     }
     else {
-      command = server.arg(i);                            // The command of this query.
+      command = server.arg(i);                              // The command of this query.
     }
   }
-  if (command != "") {                                    // Must have a command for a valid query!
+  if (command != "") {                                      // Must have a command for a valid query!
     uint8_t tray;
     uint8_t id;
     bool argsValid = true;
 
     // Most commands have a tray parameter; take care of that one here.
     bool haveTray = false;
-    for (uint8_t i = 0; i < nArgs; i++) {                 // Search for the tray number.
+    for (uint8_t i = 0; i < nArgs; i++) {                   // Search for the tray number.
       if (keys[i] == F("tray")) {
-        if (values[i] >= TRAYS) {                         // Invalid tray number given, invalidate arguments.
+        if (values[i] >= TRAYS) {                           // Invalid tray number given, invalidate arguments.
           argsValid = false;
           break;
         }
@@ -272,7 +271,7 @@ void handleCropProgramRequest() {
       // command set_crop
       if (command == F("set_crop") &&
           haveTray &&
-          trayInfo[tray].programState == PROGRAM_UNSET) {         // Set a new crop for a specific tray.
+          trayInfo[tray].programState == PROGRAM_UNSET) {   // Set a new crop for a specific tray.
         getProgramData(keys, values, nArgs, &id, tray, &argsValid);
         if (argsValid) {
           trayInfo[tray].cropId = id;
@@ -287,8 +286,8 @@ void handleCropProgramRequest() {
            trayInfo[tray].programState == PROGRAM_SET ||
            trayInfo[tray].programState == PROGRAM_COMPLETE)) {
         Serial.println(F("Got command start."));
-        if (trayInfo[tray].cropId == 255 ||                           // Custom program comes with extra parameters for the crop program.
-            trayInfo[tray].programState == PROGRAM_UNSET) {           // If tray is still unset: expect to get the cropId in the arguments (it comes from the app like this).
+        if (trayInfo[tray].cropId == 255 ||                 // Custom program comes with extra parameters for the crop program.
+            trayInfo[tray].programState == PROGRAM_UNSET) { // If tray is still unset: expect to get the cropId in the arguments (it comes from the app like this).
           getProgramData(keys, values, nArgs, &id, tray, &argsValid);
           Serial.print(F("Got crop ID: "));
           Serial.println(id);
