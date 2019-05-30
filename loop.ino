@@ -5,7 +5,7 @@ void loop() {
   /* END OTA (part 3 of 3) */
 #endif
 
-  // Check for incoming http connections.
+   // Check for incoming http connections.
   uint32_t startLoop = millis();
   server.handleClient();
   yield();

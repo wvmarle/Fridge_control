@@ -3,7 +3,7 @@
 #include <SoftwareSerial.h>
 #include <EEPROM.h>
 
-#define DEBUG
+//#define DEBUG
 
 const uint8_t rxPin = 6;
 const uint8_t txPin = 5;

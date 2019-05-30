@@ -60,6 +60,7 @@ HydroMonitorNetwork network;
 #include <HydroMonitorLogging.h>
 HydroMonitorLogging logging;
 ESP8266WebServer server(80);
+bool APIRequest;                                              // To flag the handler it's coming through the API.
 
 /***************************************************************************************************
    HydroMonitor library: various core functions and settings.
@@ -232,10 +233,10 @@ const uint16_t TRAYINFO_EEPROM = FREE_EEPROM;
 const uint16_t FLOWSENSOR_COUNT_EEPROM = TRAYINFO_EEPROM + sizeof(trayInfo);
 
 // Fridge access point.
-//const char* local_name = "fridgea";
-//const char* ap_ssid = "Fridge A";
-const char* local_name = "fridgeb";
-const char* ap_ssid = "Fridge B";
+const char* local_name = "fridgea";
+const char* ap_ssid = "Fridge A";
+//const char* local_name = "fridgeb";
+//const char* ap_ssid = "Fridge B";
 const char* ap_password = "fridgewifi";
 
 #ifdef USE_OTA

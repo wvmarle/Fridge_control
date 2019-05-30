@@ -4,6 +4,7 @@
 */
 void handleAPI() {
   uint8_t nArgs = server.args();                            // the number of arguments present. All arguments are expected to be key/value pairs.
+  APIRequest = true;                                        // Flag that we're currently handling an API request, so handlers can select the appropriate return.
   if (nArgs > 0) {
     String request = server.arg(F("request"));
 
@@ -12,6 +13,7 @@ void handleAPI() {
     Serial.print(F(" arguments, and request: "));
     Serial.println(request);
     uint32_t startMillis = millis();
+    APIRequest = true;
     
     // getdata: return all available sensor data as JSON string.
     if (request == F("get_data")) {
@@ -150,6 +152,7 @@ void handleAPI() {
     Serial.print(millis() - startMillis);
     Serial.println(F(" ms."));
   }
+  APIRequest = false;
 }
 
 void sendJsonHeader() {
