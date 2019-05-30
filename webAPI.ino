@@ -13,7 +13,6 @@ void handleAPI() {
     Serial.print(F(" arguments, and request: "));
     Serial.println(request);
     uint32_t startMillis = millis();
-    APIRequest = true;
     
     // getdata: return all available sensor data as JSON string.
     if (request == F("get_data")) {

@@ -5,7 +5,7 @@ void loop() {
   /* END OTA (part 3 of 3) */
 #endif
 
-   // Check for incoming http connections.
+  // Check for incoming http connections.
   uint32_t startLoop = millis();
   server.handleClient();
   yield();
@@ -42,13 +42,13 @@ void loop() {
 #endif
     trayInfoChanged = false;
   }
-//  yield();
-//  static uint32_t freeHeap;
-//  static uint32_t previousFreeHeap;
-//  freeHeap = ESP.getFreeHeap();
-//  if (freeHeap != previousFreeHeap) {
-//    Serial.print(F("Heap changed! Current free heap: "));
-//    Serial.println(freeHeap);
-//    previousFreeHeap = freeHeap;
-//  }
+  //  yield();
+  //  static uint32_t freeHeap;
+  //  static uint32_t previousFreeHeap;
+  //  freeHeap = ESP.getFreeHeap();
+  //  if (freeHeap != previousFreeHeap) {
+  //    Serial.print(F("Heap changed! Current free heap: "));
+  //    Serial.println(freeHeap);
+  //    previousFreeHeap = freeHeap;
+  //  }
 }

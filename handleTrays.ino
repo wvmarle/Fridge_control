@@ -162,7 +162,6 @@ void handleTrays() {
         wateringTime[tray] = millis();
         waterFlowSensorTicks[tray] = 0;                     // Look for backflow.
         mcp0.digitalWrite(PUMP_PIN[tray], LOW);             // Switch off the pump.
-        
       }
 
       // Check the presence of the trays, and set the program state accordingly.
