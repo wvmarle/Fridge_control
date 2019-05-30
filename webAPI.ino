@@ -213,6 +213,7 @@ void sendSystemData() {
         break;
 
       case PROGRAM_PAUSED:
+      case PROGRAM_START_PAUSED:
         server.sendContent_P(PSTR("\"paused\""));
         break;
 

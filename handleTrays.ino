@@ -15,6 +15,10 @@ void handleTrays() {
             wateringTime[tray] = millis();
             break;
         }
+        switch (trayInfo[tray].programState) {
+          case PROGRAM_START_WATERING:
+            trayInfo[tray].programState = PROGRAM_START;
+        }
       }
       bitClear(sensorData.systemStatus, STATUS_WATERING);   // Not watering any more.
     }
@@ -158,6 +162,7 @@ void handleTrays() {
         wateringTime[tray] = millis();
         waterFlowSensorTicks[tray] = 0;                     // Look for backflow.
         mcp0.digitalWrite(PUMP_PIN[tray], LOW);             // Switch off the pump.
+        
       }
 
       // Check the presence of the trays, and set the program state accordingly.

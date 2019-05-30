@@ -133,6 +133,7 @@ void handleRoot() {
         break;
 
       case PROGRAM_PAUSED:
+      case PROGRAM_START_PAUSED:
         server.sendContent_P(PSTR("\
             Program on hold - no lights, no watering."));
         break;
@@ -301,20 +302,35 @@ void handleCropProgramRequest() {
       }
 
       // Command resume.
-      if (command == F("resume") &&
-          (trayInfo[tray].programState == PROGRAM_PAUSED ||
-           trayInfo[tray].programState == PROGRAM_ERROR)) {
-        trayInfo[tray].programState = PROGRAM_RUNNING;
-        trayInfoChanged = true;
+      if (command == F("resume")) {
+        switch (trayInfo[tray].programState) {
+          case PROGRAM_PAUSED:
+          case PROGRAM_ERROR:
+            trayInfo[tray].programState = PROGRAM_RUNNING;
+            trayInfoChanged = true;
+            break;
+
+          case PROGRAM_START_PAUSED:
+            trayInfo[tray].programState = PROGRAM_START;
+            trayInfoChanged = true;
+            break;
+        }
       }
 
       // Command pause.
-      if (command == F("pause") &&
-          (trayInfo[tray].programState == PROGRAM_RUNNING ||
-           trayInfo[tray].programState == PROGRAM_START ||
-           trayInfo[tray].programState == PROGRAM_START_WATERING)) {
-        trayInfo[tray].programState = PROGRAM_PAUSED;
-        trayInfoChanged = true;
+      if (command == F("pause")) {
+        switch (trayInfo[tray].programState) {
+          case PROGRAM_RUNNING:
+            trayInfo[tray].programState = PROGRAM_PAUSED;
+            trayInfoChanged = true;
+            break;
+
+          case PROGRAM_START:
+          case PROGRAM_START_WATERING:
+            trayInfo[tray].programState = PROGRAM_START_PAUSED;
+            trayInfoChanged = true;
+            break;
+        }
       }
 
       // Command reset
@@ -387,6 +403,7 @@ void buttonHtml(uint8_t tray) {
           &nbsp;\n"));
       break;
     case PROGRAM_PAUSED:
+    case PROGRAM_START_PAUSED:
     case PROGRAM_ERROR:
       server.sendContent_P(PSTR("\n\
           <button type=\"submit\" name=\"command\" value=\"resume\">Resume</button>\n\

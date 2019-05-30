@@ -155,6 +155,7 @@ enum ProgramState {
   PROGRAM_SET,                                              // Crop has been set.
   PROGRAM_START,                                            // Program is starting.
   PROGRAM_START_WATERING,                                   // Program start: running pump for initial watering.
+  PROGRAM_START_PAUSED,                                     // Program paused during start-up stage.
   PROGRAM_RUNNING,                                          // Program in progress.
   PROGRAM_COMPLETE,                                         // Program complete - but if tray is still present, continue as usual.
   PROGRAM_PAUSED,                                           // Program on hold - no lights, no watering.
