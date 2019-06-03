@@ -4,7 +4,8 @@ void handleTrays() {
   if (bitRead(sensorData.systemStatus, STATUS_DRAINING_RESERVOIR) ||
       bitRead(sensorData.systemStatus, STATUS_FILLING_RESERVOIR) ||
       bitRead(sensorData.systemStatus, STATUS_DOOR_OPEN) ||
-      bitRead(sensorData.systemStatus, STATUS_MAINTENANCE)) { // System is doing something that prevents us from watering.
+      bitRead(sensorData.systemStatus, STATUS_MAINTENANCE || // System is doing something that prevents us from watering,
+      millis() < DRAIN_TIME )) {                            // or we've just started up - wait some time to ensure draining trays have really drained completely.
     if (bitRead(sensorData.systemStatus, STATUS_WATERING)) {// But we're currently watering! Make sure all pumps are off.
       for (uint8_t tray = 0; tray < TRAYS; tray++) {
         switch (wateringState[tray]) {

@@ -135,7 +135,7 @@ void handleAPI() {
     else if (request == F("get_flowsensor_calibration")) {
       getFlowsensorCalibration();
     }
-    else if (request == "start_flowsensor_calibration") {
+    else if (request == F("start_flowsensor_calibration")) {
       handleCalibrateFlowsensorsActionStart();
       getFlowsensorCalibration();
     }

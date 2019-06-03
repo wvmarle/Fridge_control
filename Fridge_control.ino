@@ -73,7 +73,7 @@ HydroMonitorGrowingParameters parameters;
 // The various variables containing the data from the sensors.
 HydroMonitorCore::SensorData sensorData;
 
-//#define USE_OTA                                             // Disable this line for the ESP-7 module which doesn't have the memory to do OTA updates.
+#define USE_OTA
 
 const uint8_t TRAYS = 8;
 
@@ -232,11 +232,20 @@ char buff[MAX_MESSAGE_SIZE];                                // General purpose s
 const uint16_t TRAYINFO_EEPROM = FREE_EEPROM;
 const uint16_t FLOWSENSOR_COUNT_EEPROM = TRAYINFO_EEPROM + sizeof(trayInfo);
 
+#define FRIDGE_A
+//#define FRIDGE_B
+
 // Fridge access point.
+#ifdef FRIDGE_A
 const char* local_name = "fridgea";
 const char* ap_ssid = "Fridge A";
-//const char* local_name = "fridgeb";
-//const char* ap_ssid = "Fridge B";
+const char* ota_password = "fridgea";
+#elif defined(FRIDGE_B)
+const char* local_name = "fridgeb";
+const char* ap_ssid = "Fridge B";
+const char* ota_password = "fridgeb";
+#endif
+
 const char* ap_password = "fridgewifi";
 
 #ifdef USE_OTA

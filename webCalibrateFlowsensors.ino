@@ -110,10 +110,7 @@ void handleCalibrateFlowsensorsActionStart() {
       }
     }
   }
-  if (APIRequest) {
-    getFlowsensorCalibration();
-  }
-  else {
+  if (APIRequest == false) {
     handleCalibrateFlowsensors();
   }
 }
@@ -141,10 +138,7 @@ void handleCalibrateFlowsensorsActionStop() {
       }
     }
   }
-  if (APIRequest) {
-    getFlowsensorCalibration();
-  }
-  else {
+  if (APIRequest == false) {
     handleCalibrateFlowsensors();
   }
 }

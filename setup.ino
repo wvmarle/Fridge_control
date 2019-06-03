@@ -69,15 +69,19 @@ void setup() {
 
 #ifdef USE_OTA
   /* BEGIN OTA (part 2 of 3) */
-  ArduinoOTA.setHostname("ESP8266");
-  ArduinoOTA.setPassword("esp");
+  ArduinoOTA.setHostname(local_name);
+  ArduinoOTA.setPassword(ota_password);
   ArduinoOTA.onStart([]() {
+#ifdef HYDROMONITOR_WILLIAMS_FRIDGE_V1_H
     os_timer_arm(&blinkTimer, 200, true);
+#endif
     Serial.println(F("Start"));
   });
   ArduinoOTA.onEnd([]() {
+#ifdef HYDROMONITOR_WILLIAMS_FRIDGE_V1_H
     os_timer_disarm(&blinkTimer);
     writeLed(LOW);
+#endif
     Serial.println(F("\nEnd"));
   });
   ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
@@ -98,7 +102,9 @@ void setup() {
   // Recovery option: in case of any crashes later in the setup, this allows for easy recovery by uploading a new
   // sketch OTA instead of having to fall back on Serial right away.
   // Blink WIFILED fast to indicate we're at this stage.
+#ifdef HYDROMONITOR_WILLIAMS_FRIDGE_V1_H
   os_timer_arm(&blinkTimer, 200, true);
+#endif
   Serial.println(F("Starting 5 - second OTA recovery window."));
   uint32_t startTime = millis();
   while (millis() - startTime < 5000) {
@@ -167,20 +173,27 @@ void setup() {
   os_timer_disarm(&blinkTimer);
   mcp0.digitalWrite(WIFI_LED_PIN, HIGH);
 #endif
+
+  for (uint8_t tray = 0; tray < TRAYS; tray++ ) {
+    wateringTime[tray] = -DRAIN_TIME * 2;                   // Ensure we're going to check for flow right away.
+  }
+
 }
 
 void MCP_init() {
+  mcp0.begin(0);                                            // The mcp23017 port expanders.
+  mcp1.begin(1);
+
 #ifdef HYDROMONITOR_WILLIAMS_FRIDGE_V2_H
-  // Enable the mcp port extenders - bring the RESET pin high by setting the output LOW.
+  // Force a reset upon the mcp port extenders.
   pinMode(MCP_RESET, OUTPUT);
   digitalWrite(MCP_RESET, HIGH);                            // Force reset.
   delay(10);                                                // Give some time for a proper reset.
+  
+  // Enable the mcp port extenders - bring the RESET pin high by setting the output LOW.
   digitalWrite(MCP_RESET, LOW);                             // Bring the RESET pin of the MCP port extenders HIGH.
   delay(10);                                                // Allow the ICs to start up.
 #endif
-
-  mcp0.begin(0);                                            // The mcp23017 port expanders.
-  mcp1.begin(1);
 
 #ifdef HYDROMONITOR_WILLIAMS_FRIDGE_V1_H
   mcp0.pinMode(WIFI_LED_PIN, OUTPUT);                       // WiFi indicator LED.
@@ -188,14 +201,13 @@ void MCP_init() {
   os_timer_arm(&blinkTimer, 500, true);
 #endif
 
-
-  for (uint8_t i = 0; i < TRAYS; i++ ) {
-    mcp1.pinMode(FLOW_PIN[i], INPUT);                       // The flow sensors.
-    mcp1.pullUp(FLOW_PIN[i], true);                         // Hall effect sensor: driven high/low.
-    mcp1.pinMode(TRAY_PIN[i], INPUT);                       // The tray pins.
-    mcp1.pullUp(TRAY_PIN[i], true);                         // Open collector output.
-    mcp0.pinMode(PUMP_PIN[i], OUTPUT);                      // The water pumps.
-    mcp0.digitalWrite(PUMP_PIN[i], LOW);                    // Make sure those pumps are off.
+  for (uint8_t tray = 0; tray < TRAYS; tray++ ) {
+    mcp1.pinMode(FLOW_PIN[tray], INPUT);                    // The flow sensors.
+    mcp1.pullUp(FLOW_PIN[tray], true);                      // Hall effect sensor: driven high/low.
+    mcp1.pinMode(TRAY_PIN[tray], INPUT);                    // The tray pins.
+    mcp1.pullUp(TRAY_PIN[tray], true);                      // Open collector output.
+    mcp0.pinMode(PUMP_PIN[tray], OUTPUT);                   // The water pumps.
+    mcp0.digitalWrite(PUMP_PIN[tray], LOW);                 // Make sure those pumps are off.
   }
   oldFlowSensorPins = mcp1.readGPIO(0);
 #ifdef HYDROMONITOR_WILLIAMS_FRIDGE_V1_H
