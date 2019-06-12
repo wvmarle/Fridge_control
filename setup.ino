@@ -148,20 +148,21 @@ void setup() {
 #endif
 
   // Check wether we have valid data in the tray info - if not reset this tray.
-  for (uint8_t i = 0; i < TRAYS; i++) {
-    if (isValidFrequency(trayInfo[i].wateringFrequency) == false) {
-      trayInfo[i].programState = PROGRAM_UNSET;
-      trayInfo[i].cropId = 0;
-      trayInfo[i].startTime = 0;
+  for (uint8_t tray = 0; tray < TRAYS; tray++) {
+    if (isValidFrequency(trayInfo[tray].wateringFrequency) == false) {
+      trayInfo[tray].programState = PROGRAM_UNSET;
+      trayInfo[tray].cropId = 0;
+      trayInfo[tray].startTime = 0;
 #ifdef USE_GROWLIGHT
-      trayInfo[i].darkDays = 0;
+      trayInfo[tray].darkDays = 0;
 #endif
-      trayInfo[i].totalDays = 0;
-      trayInfo[i].wateringFrequency = 0;
+      trayInfo[tray].totalDays = 0;
+      trayInfo[tray].wateringFrequency = 0;
     }
-    wateringState[i] = WATERING_IDLE;
+    wateringTime[tray] = 0;
+//    wateringState[tray] = DRAINING;
   }
-  if (!MDNS.begin("fridgeb")) {                             // Start the mDNS responder for local_name.local
+  if (!MDNS.begin(local_name)) {                            // Start the mDNS responder for local_name.local
     Serial.println("Error setting up MDNS responder!");
   }
   else {
@@ -173,11 +174,6 @@ void setup() {
   os_timer_disarm(&blinkTimer);
   mcp0.digitalWrite(WIFI_LED_PIN, HIGH);
 #endif
-
-  for (uint8_t tray = 0; tray < TRAYS; tray++ ) {
-    wateringTime[tray] = -DRAIN_TIME * 2;                   // Ensure we're going to check for flow right away.
-  }
-
 }
 
 void MCP_init() {

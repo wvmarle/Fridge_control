@@ -232,8 +232,8 @@ char buff[MAX_MESSAGE_SIZE];                                // General purpose s
 const uint16_t TRAYINFO_EEPROM = FREE_EEPROM;
 const uint16_t FLOWSENSOR_COUNT_EEPROM = TRAYINFO_EEPROM + sizeof(trayInfo);
 
-#define FRIDGE_A
-//#define FRIDGE_B
+//#define FRIDGE_A
+#define FRIDGE_B
 
 // Fridge access point.
 #ifdef FRIDGE_A
