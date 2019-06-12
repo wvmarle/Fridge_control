@@ -298,6 +298,9 @@ void sendSettingsJSON() {
   if (pHMinus.settingsJSON(&server)) {
     server.sendContent_P(PSTR(",\n"));
   }
+  if (reservoir.settingsJSON(&server)) {
+    server.sendContent_P(PSTR(",\n"));
+  }
   if (drainage.settingsJSON(&server)) {
     server.sendContent_P(PSTR(",\n"));
   }

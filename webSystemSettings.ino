@@ -13,6 +13,7 @@ void handleSettings() {
   }
   fertiliser.settingsHtml(&server);
   pHMinus.settingsHtml(&server);
+  reservoir.settingsHtml(&server);
   drainage.settingsHtml(&server);
   logging.settingsHtml(&server);
   network.settingsHtml(&server);
