@@ -1,3 +1,7 @@
+//#define FRIDGE_A
+#define FRIDGE_B
+
+
 // System includes
 #include <ESP8266WiFi.h>
 #include <Adafruit_MCP23017.h>
@@ -231,9 +235,6 @@ char buff[MAX_MESSAGE_SIZE];                                // General purpose s
 // Some have been defined already in HydroMonitorCore! Can use space starting at FREE_EEPROM.
 const uint16_t TRAYINFO_EEPROM = FREE_EEPROM;
 const uint16_t FLOWSENSOR_COUNT_EEPROM = TRAYINFO_EEPROM + sizeof(trayInfo);
-
-//#define FRIDGE_A
-#define FRIDGE_B
 
 // Fridge access point.
 #ifdef FRIDGE_A
