@@ -49,6 +49,7 @@ void setSettings() {
   network.updateSettings(&server);
   parameters.updateSettings(&server);
   drainage.updateSettings(&server);
+  reservoir.updateSettings(&server);
 
   for (uint8_t i = 0; i < server.args(); i++) {
     Serial.print(F("Argument: "));

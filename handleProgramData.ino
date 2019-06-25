@@ -204,7 +204,7 @@ void cropProgramHtml(uint8_t tray) {
       server.sendContent_P(PSTR("\
             Growlight after: <input type=\"text\" name=\"dark_days\" size=\"2\" value=\""));
       server.sendContent(itoa(trayInfo[tray].darkDays, buff, 10));
-      server.sendContent_P(PSTR("\"> days.<br>\n"))
+      server.sendContent_P(PSTR("\"> days.<br>\n"));
 #endif
       server.sendContent_P(PSTR("\
             Watering: <select name=\"watering_frequency\">\n"));

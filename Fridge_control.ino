@@ -3,7 +3,7 @@
 #include <Adafruit_MCP23017.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
-#include <DS1603L.h>
+//#include <DS1603L.h>
 #include <ArduinoJson.h>
 #include <FS.h>
 #include <SoftwareSerial.h>
