@@ -8,7 +8,7 @@
 #include <FS.h>
 #include <SoftwareSerial.h>
 #include <ESP8266WiFiMulti.h>
-#include <ESP8266mDNS.h>
+//#include <ESP8266mDNS.h>
 ESP8266WiFiMulti wifiMulti;
 
 /****************************************************************************************************

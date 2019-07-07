@@ -9,7 +9,7 @@ E24LC256 EXTERNAL_EEPROM(0x50);
 
 void setup() {
 #ifdef USE_DS1603L
-  Serial.begin(9600);                                       // DS1603LSensor transmits its data at 9600 bps.
+  Serial.begin(9600);                                       // DS1603L sensor transmits its data at 9600 bps.
 #elif defined(USE_SERIAL)
   Serial.begin(115200);
 #endif
@@ -33,40 +33,58 @@ void setup() {
   core.begin(&sensorData);
   logging.begin(&sensorData);
 
-  // Network details.
-  WiFi.mode(WIFI_AP_STA);                                   // Act as station and accses point.
-  wifiMulti.addAP("Squirrel", "AcornsAreYummie");
-  wifiMulti.addAP("Bustling City Tours", "bustlingcity");
+  /***********************************************************************************************************
+     WiFi related setup and configurations.
+  */
+  // This hopefully solves connection problems at K11/Rosewood.
+//  WiFi.disconnect(true);                                    // Explicit disconnect of the station.
+//  ESP.eraseConfig();                                        // Clear any stored WiFi configurations.
+  //  WiFi.setOutputPower(20.5);                                // Increase the output power (range: 0-20.5).
+//  WiFi.setPhyMode((WiFiPhyMode_t)PHY_MODE_11G);             // Make sure we're not in 802.11n mode, in which access point won't work (well).
+//  WiFi.setAutoConnect(false);                               // Don't try to autoconnect WiFi as station. We only try to connect upon startup.
+//  WiFi.mode(WIFI_AP_STA);                                   // Act as station and access point.
+  WiFi.mode(WIFI_AP);                                   // Act as access point.
 
-#ifdef USE_SERIAL
-  Serial.print(F("Connecting to WiFi network..."));
-#endif
-  int i = 0;
-  while (wifiMulti.run() != WL_CONNECTED) {
-    delay(1000);
-#ifdef USE_SERIAL
-    Serial.print(++i);
-    Serial.print(' ');
-#endif
-    if (i > 12) {
-#ifdef USE_SERIAL
-      Serial.println();
-      Serial.println(F("No network found - continuing without. The system will connect on itself later when a network becomes available."));
-#endif
-      break;
-    }
-  }
-  sprintf_P(buff, PSTR("WiFi connected to: %s"), WiFi.SSID().c_str());
-  logging.writeInfo(buff);
-  sprintf_P(buff, PSTR("IP address: %s"), WiFi.localIP().toString().c_str());
-  logging.writeInfo(buff);
-  WiFi.softAP(ap_ssid, ap_password);                        // Set up the access point.
+//    // Network details.
+//    wifiMulti.addAP("Squirrel", "AcornsAreYummie");
+//    wifiMulti.addAP("Bustling City Tours", "bustlingcity");
+//  
+//  
+//  #ifdef USE_SERIAL
+//    Serial.print(F("Connecting to WiFi network..."));
+//  #endif
+//    int i = 0;
+//    while (wifiMulti.run() != WL_CONNECTED) {
+//      delay(1000);
+//  #ifdef USE_SERIAL
+//      Serial.print(++i);
+//      Serial.print(' ');
+//  #endif
+//      if (i > 12) {
+//  #ifdef USE_SERIAL
+//        Serial.println();
+//        Serial.println(F("No network found - continuing without. The system will connect on itself later when a network becomes available."));
+//  #endif
+//        break;
+//      }
+//    }
+//    sprintf_P(buff, PSTR("WiFi connected to: %s"), WiFi.SSID().c_str());
+//    logging.writeInfo(buff);
+//    sprintf_P(buff, PSTR("IP address: %s"), WiFi.localIP().toString().c_str());
+//    logging.writeInfo(buff);
+
+  WiFi.softAP(ap_ssid, ap_password);                        // Set up the access point (probably best to do this BEFORE trying to make a connection as station to prevent channel hopping issues).
+  //  WiFi.softAP(ssid, password, channel, hidden, max_connection)
+  //  WiFi.softAP(ap_ssid, ap_password, channel, false, 4)      // channel: 1-13, default: 1.
   delay(100);                                               // Wait for AP to start up before configuring it.
   IPAddress local_IP(192, 168, 4, 1);
   IPAddress gateway(192, 168, 4, 1);
   IPAddress subnet(255, 255, 255, 0);
   WiFi.softAPConfig(local_IP, gateway, subnet);
 
+  /***********************************************************************************************************
+
+  */
 #ifdef USE_OTA
   /* BEGIN OTA (part 2 of 3) */
   ArduinoOTA.setHostname(local_name);
@@ -160,14 +178,14 @@ void setup() {
       trayInfo[tray].wateringFrequency = 0;
     }
     wateringTime[tray] = 0;
-//    wateringState[tray] = DRAINING;
+    //    wateringState[tray] = DRAINING;
   }
-  if (!MDNS.begin(local_name)) {                            // Start the mDNS responder for local_name.local
-    Serial.println("Error setting up MDNS responder!");
-  }
-  else {
-    Serial.println("mDNS responder started");
-  }
+  //  if (!MDNS.begin(local_name)) {                            // Start the mDNS responder for local_name.local
+  //    Serial.println("Error setting up MDNS responder!");
+  //  }
+  //  else {
+  //    Serial.println("mDNS responder started");
+  //  }
 
 #ifdef HYDROMONITOR_WILLIAMS_FRIDGE_V1_H
   // Stop blinking the WiFi LED - by the time we're here, WiFi is connected and we're ready to go.
@@ -185,7 +203,7 @@ void MCP_init() {
   pinMode(MCP_RESET, OUTPUT);
   digitalWrite(MCP_RESET, HIGH);                            // Force reset.
   delay(10);                                                // Give some time for a proper reset.
-  
+
   // Enable the mcp port extenders - bring the RESET pin high by setting the output LOW.
   digitalWrite(MCP_RESET, LOW);                             // Bring the RESET pin of the MCP port extenders HIGH.
   delay(10);                                                // Allow the ICs to start up.

@@ -13,12 +13,21 @@ void handleAPI() {
     Serial.print(F(" arguments, and request: "));
     Serial.println(request);
     uint32_t startMillis = millis();
-    
-    // getdata: return all available sensor data as JSON string.
+    if (server.hasArg(F("datetime"))) {                     // Check for a current timestamp; if provided set our local time accordingly.
+      String ts = server.arg(F("datetime"));
+      ts.remove(10);                                        // Timestamp comes in millis, keep only the first 10 digits or we're going to overflow the toInt() function.
+      uint32_t timestamp = ts.toInt();
+      if (timestamp > 1546300800) {                         // It's a sensible timestamp - use it.
+        setTime(timestamp);
+      }
+    }
+
+    // get_data: return all available sensor data as JSON string.
     if (request == F("get_data")) {
       sendSystemData();
     }
 
+    // get_crop_data: return a list of available crops.
     else if (request == F("get_crop_data")) {
       sendCropList();
     }

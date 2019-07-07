@@ -24,13 +24,13 @@ void loop() {
   logging.logData();
   yield();
 
-  // Every REFRESH_NTP seconds: update the time.
-  if (millis() - lastNtpUpdateTime > REFRESH_NTP) {
-    lastNtpUpdateTime += REFRESH_NTP;
-    network.ntpUpdateInit();
-    updatingTime = true;
-  }
-  if (updatingTime) updatingTime = network.ntpCheck();
+//  // Every REFRESH_NTP seconds: update the time.
+//  if (millis() - lastNtpUpdateTime > REFRESH_NTP) {
+//    lastNtpUpdateTime += REFRESH_NTP;
+//    network.ntpUpdateInit();
+//    updatingTime = true;
+//  }
+//  if (updatingTime) updatingTime = network.ntpCheck();
 
   // Update the EEPROM.
   if (trayInfoChanged) {
