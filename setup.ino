@@ -36,51 +36,138 @@ void setup() {
   /***********************************************************************************************************
      WiFi related setup and configurations.
   */
-  // This hopefully solves connection problems at K11/Rosewood.
-//  WiFi.disconnect(true);                                    // Explicit disconnect of the station.
-//  ESP.eraseConfig();                                        // Clear any stored WiFi configurations.
-  //  WiFi.setOutputPower(20.5);                                // Increase the output power (range: 0-20.5).
-//  WiFi.setPhyMode((WiFiPhyMode_t)PHY_MODE_11G);             // Make sure we're not in 802.11n mode, in which access point won't work (well).
-//  WiFi.setAutoConnect(false);                               // Don't try to autoconnect WiFi as station. We only try to connect upon startup.
-//  WiFi.mode(WIFI_AP_STA);                                   // Act as station and access point.
-  WiFi.mode(WIFI_AP);                                   // Act as access point.
 
-//    // Network details.
-//    wifiMulti.addAP("Squirrel", "AcornsAreYummie");
-//    wifiMulti.addAP("Bustling City Tours", "bustlingcity");
-//  
-//  
-//  #ifdef USE_SERIAL
-//    Serial.print(F("Connecting to WiFi network..."));
-//  #endif
-//    int i = 0;
-//    while (wifiMulti.run() != WL_CONNECTED) {
-//      delay(1000);
-//  #ifdef USE_SERIAL
-//      Serial.print(++i);
-//      Serial.print(' ');
-//  #endif
-//      if (i > 12) {
-//  #ifdef USE_SERIAL
-//        Serial.println();
-//        Serial.println(F("No network found - continuing without. The system will connect on itself later when a network becomes available."));
-//  #endif
-//        break;
-//      }
-//    }
-//    sprintf_P(buff, PSTR("WiFi connected to: %s"), WiFi.SSID().c_str());
-//    logging.writeInfo(buff);
-//    sprintf_P(buff, PSTR("IP address: %s"), WiFi.localIP().toString().c_str());
-//    logging.writeInfo(buff);
+//#define OPTION1                                             // Only access point, no connection to other networks.
+#define OPTION2                                             // AP & STA; try to connect STA first; then set up AP. No autoconnect.
+//#define OPTION3                                             // AP & STA; try to connect STA first; then set up AP. Enables autoconnect.
 
+#ifdef OPTION1
+  WiFi.mode(WIFI_AP);                                       // Act as access point.
   WiFi.softAP(ap_ssid, ap_password);                        // Set up the access point (probably best to do this BEFORE trying to make a connection as station to prevent channel hopping issues).
-  //  WiFi.softAP(ssid, password, channel, hidden, max_connection)
-  //  WiFi.softAP(ap_ssid, ap_password, channel, false, 4)      // channel: 1-13, default: 1.
   delay(100);                                               // Wait for AP to start up before configuring it.
   IPAddress local_IP(192, 168, 4, 1);
   IPAddress gateway(192, 168, 4, 1);
   IPAddress subnet(255, 255, 255, 0);
   WiFi.softAPConfig(local_IP, gateway, subnet);
+
+#elif defined(OPTION2)
+  WiFi.disconnect(true);                                    // Explicit disconnect of the station.
+  WiFi.setAutoConnect(false);                               // Don't try to autoconnect WiFi as station. We only try to connect upon startup.
+  WiFi.mode(WIFI_AP_STA);                                   // Act as station and access point.
+  wifiMulti.addAP("Squirrel", "AcornsAreYummie");           // Home network.
+  wifiMulti.addAP("Bustling City Tours", "bustlingcity");   // Phone network.
+#ifdef USE_SERIAL
+  Serial.print(F("Connecting to WiFi network..."));
+#endif
+  int i = 0;
+  while (wifiMulti.run() != WL_CONNECTED) {
+    delay(1000);
+#ifdef USE_SERIAL
+    Serial.print(++i);
+    Serial.print(' ');
+#endif
+    if (i > 30) {
+#ifdef USE_SERIAL
+      Serial.println();
+      Serial.println(F("No network found - continuing without. No autoreconnect will take place."));
+#endif
+      WiFi.disconnect(true);                                // Explicit disconnect of the station.
+      break;
+    }
+  }
+  sprintf_P(buff, PSTR("WiFi connected to: %s"), WiFi.SSID().c_str());
+  logging.writeInfo(buff);
+  sprintf_P(buff, PSTR("IP address: %s"), WiFi.localIP().toString().c_str());
+  logging.writeInfo(buff);
+
+  WiFi.softAP(ap_ssid, ap_password);                        // Set up the access point.
+  delay(100);                                               // Wait for AP to start up before configuring it.
+  IPAddress local_IP(192, 168, 4, 1);
+  IPAddress gateway(192, 168, 4, 1);
+  IPAddress subnet(255, 255, 255, 0);
+  WiFi.softAPConfig(local_IP, gateway, subnet);
+
+#elif defined(OPTION3)
+  WiFi.disconnect(true);                                    // Explicit disconnect of the station.
+  WiFi.mode(WIFI_AP_STA);                                   // Act as station and access point.
+  wifiMulti.addAP("Squirrel", "AcornsAreYummie");           // Home network.
+  wifiMulti.addAP("Bustling City Tours", "bustlingcity");   // Phone network.
+#ifdef USE_SERIAL
+  Serial.print(F("Connecting to WiFi network..."));
+#endif
+  int i = 0;
+  while (wifiMulti.run() != WL_CONNECTED) {
+    delay(1000);
+#ifdef USE_SERIAL
+    Serial.print(++i);
+    Serial.print(' ');
+#endif
+    if (i > 30) {
+#ifdef USE_SERIAL
+      Serial.println();
+      Serial.println(F("No network found - continuing without. System will continue to try to find a network."));
+#endif
+      WiFi.disconnect(true);                                // Explicit disconnect of the station.
+      break;
+    }
+  }
+  sprintf_P(buff, PSTR("WiFi connected to: %s"), WiFi.SSID().c_str());
+  logging.writeInfo(buff);
+  sprintf_P(buff, PSTR("IP address: %s"), WiFi.localIP().toString().c_str());
+  logging.writeInfo(buff);
+
+  WiFi.softAP(ap_ssid, ap_password);                        // Set up the access point.
+  delay(100);                                               // Wait for AP to start up before configuring it.
+  IPAddress local_IP(192, 168, 4, 1);
+  IPAddress gateway(192, 168, 4, 1);
+  IPAddress subnet(255, 255, 255, 0);
+  WiFi.softAPConfig(local_IP, gateway, subnet);
+#endif
+
+  // This hopefully solves connection problems at K11/Rosewood.
+  //  WiFi.disconnect(true);                                    // Explicit disconnect of the station.
+  //  ESP.eraseConfig();                                        // Clear any stored WiFi configurations.
+  //  WiFi.setOutputPower(20.5);                                // Increase the output power (range: 0-20.5).
+  //  WiFi.setPhyMode((WiFiPhyMode_t)PHY_MODE_11G);             // Make sure we're not in 802.11n mode, in which access point won't work (well).
+  //  WiFi.setAutoConnect(false);                               // Don't try to autoconnect WiFi as station. We only try to connect upon startup.
+  //  WiFi.mode(WIFI_AP_STA);                                   // Act as station and access point.
+
+  //    // Network details.
+  //    wifiMulti.addAP("Squirrel", "AcornsAreYummie");
+  //    wifiMulti.addAP("Bustling City Tours", "bustlingcity");
+  //
+  //
+  //  #ifdef USE_SERIAL
+  //    Serial.print(F("Connecting to WiFi network..."));
+  //  #endif
+  //    int i = 0;
+  //    while (wifiMulti.run() != WL_CONNECTED) {
+  //      delay(1000);
+  //  #ifdef USE_SERIAL
+  //      Serial.print(++i);
+  //      Serial.print(' ');
+  //  #endif
+  //      if (i > 12) {
+  //  #ifdef USE_SERIAL
+  //        Serial.println();
+  //        Serial.println(F("No network found - continuing without. The system will connect on itself later when a network becomes available."));
+  //  #endif
+  //        break;
+  //      }
+  //    }
+  //    sprintf_P(buff, PSTR("WiFi connected to: %s"), WiFi.SSID().c_str());
+  //    logging.writeInfo(buff);
+  //    sprintf_P(buff, PSTR("IP address: %s"), WiFi.localIP().toString().c_str());
+  //    logging.writeInfo(buff);
+
+  //  WiFi.softAP(ap_ssid, ap_password);                        // Set up the access point (probably best to do this BEFORE trying to make a connection as station to prevent channel hopping issues).
+  //  //  WiFi.softAP(ssid, password, channel, hidden, max_connection)
+  //  //  WiFi.softAP(ap_ssid, ap_password, channel, false, 4)      // channel: 1-13, default: 1.
+  //  delay(100);                                               // Wait for AP to start up before configuring it.
+  //  IPAddress local_IP(192, 168, 4, 1);
+  //  IPAddress gateway(192, 168, 4, 1);
+  //  IPAddress subnet(255, 255, 255, 0);
+  //  WiFi.softAPConfig(local_IP, gateway, subnet);
 
   /***********************************************************************************************************
 
