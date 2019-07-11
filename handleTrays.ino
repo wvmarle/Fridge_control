@@ -116,7 +116,7 @@ void handleTrays() {
               pumpConfirmedRunning = true;
             }
           }
-          if (millis() - wateringTime[tray] > 15 * 60 * 1000) { // After pumping for 15 minutes we should be long done!
+          else if (millis() - wateringTime[tray] > 15 * 60 * 1000) { // After pumping for 15 minutes we should be long done!
             sprintf_P(buff, PSTR("Watering 10: After pumping for 15 minutes tray %d did not reach the required flow count. Stopping watering, halting program for this tray."), tray + 1);
             logging.writeError(buff);
             wateringState[tray] = DRAINING;

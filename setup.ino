@@ -36,11 +36,6 @@ void setup() {
   /***********************************************************************************************************
      WiFi related setup and configurations.
   */
-
-//#define OPTION1                                             // Only access point, no connection to other networks.
-#define OPTION2                                             // AP & STA; try to connect STA first; then set up AP. No autoconnect.
-//#define OPTION3                                             // AP & STA; try to connect STA first; then set up AP. Enables autoconnect.
-
 #ifdef OPTION1
   WiFi.mode(WIFI_AP);                                       // Act as access point.
   WiFi.softAP(ap_ssid, ap_password);                        // Set up the access point (probably best to do this BEFORE trying to make a connection as station to prevent channel hopping issues).
