@@ -24,13 +24,13 @@ void loop() {
   logging.logData();
   yield();
 
-//  // Every REFRESH_NTP seconds: update the time.
-//  if (millis() - lastNtpUpdateTime > REFRESH_NTP) {
-//    lastNtpUpdateTime += REFRESH_NTP;
-//    network.ntpUpdateInit();
-//    updatingTime = true;
-//  }
-//  if (updatingTime) updatingTime = network.ntpCheck();
+  //  // Every REFRESH_NTP seconds: update the time.
+  //  if (millis() - lastNtpUpdateTime > REFRESH_NTP) {
+  //    lastNtpUpdateTime += REFRESH_NTP;
+  //    network.ntpUpdateInit();
+  //    updatingTime = true;
+  //  }
+  //  if (updatingTime) updatingTime = network.ntpCheck();
 
   // Update the EEPROM.
   if (trayInfoChanged) {
@@ -42,13 +42,12 @@ void loop() {
 #endif
     trayInfoChanged = false;
   }
-  //  yield();
-  //  static uint32_t freeHeap;
-  //  static uint32_t previousFreeHeap;
-  //  freeHeap = ESP.getFreeHeap();
-  //  if (freeHeap != previousFreeHeap) {
-  //    Serial.print(F("Heap changed! Current free heap: "));
-  //    Serial.println(freeHeap);
-  //    previousFreeHeap = freeHeap;
-  //  }
+#ifdef OPTION4
+  static wifiConnected = true;
+  if (WiFi.status() != WL_CONNECTED &&
+      wifiConnected) {                                      // Connection lost.
+    wifiConnected = false;
+    WiFi.disconnect(true);                                  // Formally disconnect from network.
+  }
+#endif
 }

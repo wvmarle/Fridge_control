@@ -117,6 +117,48 @@ void setup() {
   IPAddress gateway(192, 168, 4, 1);
   IPAddress subnet(255, 255, 255, 0);
   WiFi.softAPConfig(local_IP, gateway, subnet);
+
+#elif defined(OPTION4) || defined(OPTION5)
+  WiFi.disconnect(true);                                    // Explicit disconnect of the station.
+
+#ifdef OPTION4
+  WiFi.setAutoConnect(false);                               // Don't try to autoconnect WiFi as station. We only try to connect upon startup.
+#endif
+
+  WiFi.mode(WIFI_AP_STA);                                   // Act as station and access point.
+  WiFi.begin("Bustling City Tours", "bustlingcity");        // Phone network.
+#ifdef USE_SERIAL
+  Serial.print(F("Connecting to WiFi network..."));
+#endif
+  int i = 0;
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(1000);
+#ifdef USE_SERIAL
+    Serial.print(++i);
+    Serial.print(' ');
+#endif
+    if (i > 30) {
+#ifdef USE_SERIAL
+      Serial.println();
+      Serial.println(F("No network found - continuing without. No autoreconnect will take place."));
+#endif
+      WiFi.disconnect(true);                                // Explicit disconnect of the station.
+      break;
+    }
+  }
+  sprintf_P(buff, PSTR("WiFi connected to: %s"), WiFi.SSID().c_str());
+  logging.writeInfo(buff);
+  sprintf_P(buff, PSTR("IP address: %s"), WiFi.localIP().toString().c_str());
+  logging.writeInfo(buff);
+
+  WiFi.softAP(ap_ssid, ap_password);                        // Set up the access point.
+  delay(100);                                               // Wait for AP to start up before configuring it.
+  IPAddress local_IP(192, 168, 4, 1);
+  IPAddress gateway(192, 168, 4, 1);
+  IPAddress subnet(255, 255, 255, 0);
+  WiFi.softAPConfig(local_IP, gateway, subnet);
+
+
 #endif
 
   // This hopefully solves connection problems at K11/Rosewood.
