@@ -2,6 +2,13 @@
 #define FRIDGE_B
 
 
+//#define OPTION1                                             // Only access point, no connection to other networks.
+#define OPTION2                                             // AP & STA; try to connect STA first; then set up AP. wifiMulti. No autoconnect.
+//#define OPTION3                                             // AP & STA; try to connect STA first; then set up AP. wifiMulti. Enables autoconnect.
+//#define OPTION3                                             // AP & STA; try to connect STA first; then set up AP. Single network. Disables autoconnect, full disconnect on detection of network loss.
+//#define OPTION4                                             // AP & STA; try to connect STA first; then set up AP. Single network. Enables autoconnect.
+
+
 // System includes
 #include <ESP8266WiFi.h>
 #include <Adafruit_MCP23017.h>
