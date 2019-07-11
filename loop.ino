@@ -42,7 +42,7 @@ void loop() {
 #endif
     trayInfoChanged = false;
   }
-#ifdef (OPTION4)
+#ifdef OPTION4
   static wifiConnected = true;
   if (WiFi.status() != WL_CONNECTED &&
       wifiConnected) {                                      // Connection lost.
