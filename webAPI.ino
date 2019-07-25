@@ -296,7 +296,7 @@ void sendCropList() {
 void sendSettingsJSON() {
   sendJsonHeader();
   server.sendContent_P(PSTR("{\n"));
-  for (uint8_t i = 0; i < nSensors; i++) {
+  for (uint8_t i = 0; i < N_SENSORS; i++) {
     if (sensors[i]->settingsJSON(&server)) {
       server.sendContent_P(PSTR(",\n"));
     }

@@ -1,0 +1,20 @@
+File description:
+
+- JSON format.
+- fields:
+    - crop: name of the crop (max 31 characters).
+    - description: a short description of the crop (max 200 characters).
+    - dark_days: the number of days to keep the crop in the dark.
+    - total_days: the total days of the program.
+    - watering: the watering frequency, in times per day.
+    
+Total file size should not be more than 320 bytes.
+
+Example:
+{"crop": "crop name (max 31 characters",
+"description": "crop description (max 200 characters)",
+"dark_days": 3,
+"total_days": 8,
+"watering": 3}
+
+

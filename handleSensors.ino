@@ -38,7 +38,7 @@ void initSensors() {
 }
 
 void readSensors() {
-  for (uint8_t i = 0; i < nSensors; i++) {
+  for (uint8_t i = 0; i < N_SENSORS; i++) {
     sensors[i]->readSensor();
     yield();
   }
@@ -54,7 +54,7 @@ void readSensors() {
     oldFlowSensorPins = flowSensorPins;
   }
   trayPresence = ~mcp1.readGPIO(1) << 8;                    // Where the trays are connected. Invert (sensors are active low), then left shift by 8 as it's bank 1 (pins 8-15).
-#ifdef USE_ISOLATED_SENSOR_BOARD
-  isolatedSensorBoard.readSensor();
-#endif
+//#ifdef USE_ISOLATED_SENSOR_BOARD
+//  isolatedSensorBoard.readSensor();
+//#endif
 }
