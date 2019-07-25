@@ -8,7 +8,7 @@ void handleSettings() {
   server.sendContent_P(PSTR("\
   <form action=\"/set_settings\" method=\"post\">\n\
     <table>\n"));
-  for (uint8_t i = 0; i < nSensors; i++) {
+  for (uint8_t i = 0; i < N_SENSORS; i++) {
     sensors[i]->settingsHtml(&server);
   }
   fertiliser.settingsHtml(&server);
@@ -40,7 +40,7 @@ void setSettings() {
 
   // Call the updateSettings() function of all enabled sensors, where the relevant settings
   // can be handled.
-  for (uint8_t i = 0; i < nSensors; i++) {
+  for (uint8_t i = 0; i < N_SENSORS; i++) {
     sensors[i]->updateSettings(&server);
   }
   fertiliser.updateSettings(&server);

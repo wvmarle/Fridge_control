@@ -53,7 +53,7 @@ void handleRoot() {
         <th>Parameter</th>\n\
         <th>Value</th>\n\
       </tr>"));
-  for (uint8_t i = 0; i < nSensors; i++) {
+  for (uint8_t i = 0; i < N_SENSORS; i++) {
     sensors[i]->dataHtml(&server);
   }
   server.sendContent_P(PSTR("\n\
