@@ -1,7 +1,6 @@
 ///#define FRIDGE_A
 #define FRIDGE_B
 
-
 //#define OPTION1                                             // Only access point, no connection to other networks.
 //#define OPTION2                                             // AP & STA; try to connect STA first; then set up AP. wifiMulti. No autoconnect.
 //#define OPTION3                                             // AP & STA; try to connect STA first; then set up AP. wifiMulti. Enables autoconnect.
