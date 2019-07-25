@@ -43,7 +43,7 @@ void loop() {
     trayInfoChanged = false;
   }
 #ifdef OPTION4
-  static wifiConnected = true;
+  static bool MwifiConnected = true;
   if (WiFi.status() != WL_CONNECTED &&
       wifiConnected) {                                      // Connection lost.
     wifiConnected = false;
