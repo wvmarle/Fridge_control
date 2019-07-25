@@ -1,10 +1,10 @@
-#define FRIDGE_A
-//#define FRIDGE_B
+///#define FRIDGE_A
+#define FRIDGE_B
 
-#define OPTION1                                             // Only access point, no connection to other networks.
+//#define OPTION1                                             // Only access point, no connection to other networks.
 //#define OPTION2                                             // AP & STA; try to connect STA first; then set up AP. wifiMulti. No autoconnect.
 //#define OPTION3                                             // AP & STA; try to connect STA first; then set up AP. wifiMulti. Enables autoconnect.
-//#define OPTION4                                             // AP & STA; try to connect STA first; then set up AP. Single network. Disables autoconnect, full disconnect on detection of network loss.
+#define OPTION4                                             // AP & STA; try to connect STA first; then set up AP. Single network. Disables autoconnect, full disconnect on detection of network loss.
 //#define OPTION5                                             // AP & STA; try to connect STA first; then set up AP. Single network. Enables autoconnect.
 
 // System includes
@@ -16,9 +16,12 @@
 #include <ArduinoJson.h>
 #include <FS.h>
 #include <SoftwareSerial.h>
+
+#if defined(OPTION1) || defined(OPTION2) || defined (OPTION3)
 #include <ESP8266WiFiMulti.h>
-//#include <ESP8266mDNS.h>
 ESP8266WiFiMulti wifiMulti;
+#endif
+//#include <ESP8266mDNS.h>
 
 /****************************************************************************************************
    HydroMonitor library: create the sensors and include the various required libraries for them.
@@ -45,11 +48,6 @@ HydroMonitorSensorBase* sensors[] = {
 #endif
   &pHSensor,
 };
-#ifdef USE_WATERLEVEL_SENSOR
-uint8_t nSensors = 4;
-#else
-uint8_t nSensors = 3;
-#endif
 
 /***************************************************************************************************
    HydroMonitor library: the various other peripherals.
