@@ -39,16 +39,6 @@ HydroMonitorpHSensor pHSensor;
 #include <HydroMonitorDrainage.h>
 HydroMonitorDrainage drainage;
 
-// Create array of available sensors using the HydroMonitorSensorBase class with various virtual entries.
-HydroMonitorSensorBase* sensors[] = {
-  &ECSensor,
-  &waterTempSensor,
-#ifdef USE_WATERLEVEL_SENSOR
-  &waterLevelSensor,
-#endif
-  &pHSensor,
-};
-
 /***************************************************************************************************
    HydroMonitor library: the various other peripherals.
 */
@@ -146,6 +136,20 @@ SoftwareSerial sensorSerial(RX2, TX2);
 HydroMonitorIsolatedSensorBoard isolatedSensorBoard;
 #endif
 #endif
+
+// Create array of available sensors using the HydroMonitorSensorBase class with various virtual entries.
+HydroMonitorSensorBase* sensors[] = {
+  &ECSensor,
+  &waterTempSensor,
+#ifdef USE_WATERLEVEL_SENSOR
+  &waterLevelSensor,
+#endif
+  &pHSensor,
+#ifdef USE_ISOLATED_SENSOR_BOARD
+  &isolatedSensorBoard,
+#endif
+};
+
 
 uint32_t flowSensorCount[TRAYS];                            // Number of ticks for this tray to be full of water.
 bool flowSensorPinStatus[TRAYS];                            // The current pin state of this flow sensor.
