@@ -138,7 +138,7 @@ HydroMonitorIsolatedSensorBoard isolatedSensorBoard;
 #endif
 
 // Create array of available sensors using the HydroMonitorSensorBase class with various virtual entries.
-HydroMonitorSensorBase* sensors[] = {
+HydroMonitorSensorBase* sensors[N_SENSORS] = {
   &ECSensor,
   &waterTempSensor,
 #ifdef USE_WATERLEVEL_SENSOR
