@@ -67,16 +67,18 @@ void handleRoot() {
     }
     uint32_t programTimeLeft = 0;
     uint32_t programFinishTime = 0;
-    if (trayInfo[i].startTime > 0) {                        // Program has a start time, so we can calculate a finish time.
-      programFinishTime = trayInfo[i].startTime + programTime;
-      if (timeStatus() != timeNotSet) {                     // Program has a start time, and we have the current time, so we can calculate the actual time left.
-        programTimeLeft = programFinishTime - now();
+    if (programTime > 0) {                                  // Program has a set duration.
+      if (trayInfo[i].startTime > 0) {                        // Program has a start time, so we can calculate a finish time.
+        programFinishTime = trayInfo[i].startTime + programTime;
+        if (timeStatus() != timeNotSet) {                     // Program has a start time, and we have the current time, so we can calculate the actual time left.
+          programTimeLeft = programFinishTime - now();
+        }
       }
-    }
-    else if (trayInfo[i].programState != PROGRAM_UNSET) {
-      programTimeLeft = programTime;                        // Program has no start time, so time left is total program time.
-      if (timeStatus() != timeNotSet) {
-        programFinishTime = now() + programTime;            // If we have the time we calculate the projected finish time if started now.
+      else if (trayInfo[i].programState != PROGRAM_UNSET) {
+        programTimeLeft = programTime;                        // Program has no start time, so time left is total program time.
+        if (timeStatus() != timeNotSet) {
+          programFinishTime = now() + programTime;            // If we have the time we calculate the projected finish time if started now.
+        }
       }
     }
 

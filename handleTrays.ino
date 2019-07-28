@@ -152,7 +152,8 @@ void handleTrays() {
           now() > trayInfo[tray].startTime) {               // Don't get set to "completed" immediately on startup, before time has been set.
         uint32_t elapsedTime = now() - trayInfo[tray].startTime;
         elapsedTime += 43200;                               // Make sure if the tray was started before noon, the first day is counted as a whole.
-        if (int(elapsedTime / 86400) > trayInfo[tray].totalDays) {
+        if (int(elapsedTime / 86400) > trayInfo[tray].totalDays &&
+            trayInfo[tray].totalDays > 0) {                 // A value of 0 means a never ending program.
           trayInfo[tray].programState = PROGRAM_COMPLETE;   // Program completed, crop is ready for harvest.
           trayInfoChanged = true;
         }
