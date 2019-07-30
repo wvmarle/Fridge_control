@@ -211,7 +211,7 @@ struct CropId {
 };
 
 // An array to hold a complete list of crop data (note: uses 33 bytes per element).
-const uint8_t N_CROPS = 30;
+const uint8_t N_CROPS = 50;
 CropId cropId[N_CROPS];
 
 // The watering.
