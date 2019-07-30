@@ -1,5 +1,5 @@
-//#define FRIDGE_A
-#define FRIDGE_B
+#define FRIDGE_A
+//#define FRIDGE_B
 
 #define OPTION1                                             // Only access point, no connection to other networks.
 //#define OPTION2                                             // AP & STA; try to connect STA first; then set up AP. wifiMulti. No autoconnect.
@@ -211,7 +211,7 @@ struct CropId {
 };
 
 // An array to hold a complete list of crop data (note: uses 33 bytes per element).
-const uint8_t N_CROPS = 30;
+const uint8_t N_CROPS = 40;
 CropId cropId[N_CROPS];
 
 // The watering.
