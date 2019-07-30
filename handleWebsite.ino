@@ -321,6 +321,7 @@ void handleCropProgramRequest() {
 
       // Command pause.
       if (command == F("pause")) {
+        mcp0.digitalWrite(PUMP_PIN[tray], LOW);             // Make sure the pump is off, otherwise it may continue to run.
         switch (trayInfo[tray].programState) {
           case PROGRAM_RUNNING:
             trayInfo[tray].programState = PROGRAM_PAUSED;
@@ -337,6 +338,7 @@ void handleCropProgramRequest() {
 
       // Command reset
       if (command == F("reset")) {
+        mcp0.digitalWrite(PUMP_PIN[tray], LOW);             // It should always be off already but we really want to be sure.
         trayInfo[tray].programState = PROGRAM_UNSET;
         trayInfo[tray].cropId = 0;
         trayInfo[tray].startTime = 0;

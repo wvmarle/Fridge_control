@@ -15,6 +15,13 @@ Example:
 "description": "crop description (max 200 characters)",
 "dark_days": 3,
 "total_days": 8,
-"watering": 3}
+"watering": 3,
+"type": 0}
+
+Program type:
+0: unspecified
+1: microgreen
+2: babyleaf
+3: herb (continuous program)
 
 
