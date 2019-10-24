@@ -129,16 +129,16 @@ void handleTrays() {
           break;
 
         case DRAINING:                                      // Watering completed: tray drains for some time.
-          if (millis() - wateringTime[tray] > 60 * 1000 &&  // After one minute: check for back flow, to detect whether there's water draining.
-              waterFlowSensorTicks[tray] < 200 &&  // Expect at least 200 ticks on the flow meter.
-              (trayInfo[tray].programState == PROGRAM_RUNNING ||
-               trayInfo[tray].programState == PROGRAM_START_WATERING ||
-               trayInfo[tray].programState == PROGRAM_COMPLETE)) {
-            sprintf_P(buff, PSTR("Watering 11: Unusually low backflow detected from tray %d. Halting program of this tray, something appears amiss."), tray + 1);
-            logging.writeError(buff);
-            trayInfo[tray].programState = PROGRAM_ERROR;    // Halt operation of this program: an error occurred.
-            trayInfoChanged = true;
-          }
+//          if (millis() - wateringTime[tray] > 60 * 1000 &&  // After one minute: check for back flow, to detect whether there's water draining.
+//              waterFlowSensorTicks[tray] < 200 &&  // Expect at least 200 ticks on the flow meter.
+//              (trayInfo[tray].programState == PROGRAM_RUNNING ||
+//               trayInfo[tray].programState == PROGRAM_START_WATERING ||
+//               trayInfo[tray].programState == PROGRAM_COMPLETE)) {
+//            sprintf_P(buff, PSTR("Watering 11: Unusually low backflow detected from tray %d. Halting program of this tray, something appears amiss."), tray + 1);
+//            logging.writeError(buff);
+//            trayInfo[tray].programState = PROGRAM_ERROR;    // Halt operation of this program: an error occurred.
+//            trayInfoChanged = true;
+//          }
           if (millis() - wateringTime[tray] > DRAIN_TIME) {
             wateringState[tray] = WATERING_IDLE;            // Sequence complete.
             bitClear(sensorData.systemStatus, STATUS_WATERING);
