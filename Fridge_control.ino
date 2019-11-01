@@ -1,6 +1,14 @@
 //#define FRIDGE_A
 #define FRIDGE_B
 
+#ifdef FRIDGE_A
+#pragma message "Compiling for FRIDGE_A"
+#endif
+
+#ifdef FRIDGE_B
+#pragma message "Compiling for FRIDGE_B"
+#endif
+
 #define OPTION1                                             // Only access point, no connection to other networks.
 //#define OPTION2                                              // AP & STA; try to connect STA first; then set up AP. wifiMulti. No autoconnect.
 //#define OPTION3                                             // AP & STA; try to connect STA first; then set up AP. wifiMulti. Enables autoconnect.
@@ -12,7 +20,7 @@
 #include <Adafruit_MCP23017.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
-//#include <DS1603L.h>
+//#include <DS1603L.h> 
 #include <ArduinoJson.h>
 #include <FS.h>
 #include <SoftwareSerial.h>
