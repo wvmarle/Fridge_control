@@ -58,13 +58,13 @@ volatile uint32_t dischargeCycles;
 const uint8_t oversamplingRate = 6;
 const uint8_t clockspeed = 16;                // 16 MHz processor.
 const uint8_t ECOversampling = 6; // 64x oversampling.
-            
+
 const uint8_t CHARGEDELAY = 40;               // Time in microseconds it takes for the cap to charge; at least 5x RC.
-                                              // 22 nF & 330R resistor RC = 7.25 us, times 5 = 36.3 us.
+// 22 nF & 330R resistor RC = 7.25 us, times 5 = 36.3 us.
 const uint8_t DISCHARGEDELAY = 15;            // Discharge the cap before flipping polarity. Better for the pins. 2xRC.
-                                              
+
 const uint16_t EC_TIMEOUT = 2000;             // Timeout for the EC measurement in microseconds.
-                                              // 2 ms half cycle --> 250 Hz.
+// 2 ms half cycle --> 250 Hz.
 const float ALPHA = 0.02;                     // Temperature compensation factor.
 
 void initECSensor() {
@@ -151,7 +151,12 @@ uint32_t readECSensor() {
 
     // Delay based on dischargeCycles, making it equal in duration to the positive discharge cycle.
     TCNT1 = 0;
-    while (TCNT1 < dischargeCycles) {}
+    if (timeout) {
+      while (TCNT1 < (EC_TIMEOUT * clockspeed)) {}
+    }
+    else {
+      while (TCNT1 < dischargeCycles) {}
+    }
 
     ///////////////////////////////////////////////////////////////////////
     // Stage 6: fully discharge the cap, prepare for positive cycle.
@@ -164,6 +169,9 @@ uint32_t readECSensor() {
     PORTD &= ~(1 << ECPIN);                   // ECPIN pull-up resistor off.
     TCNT1 = 0;
     while (TCNT1 < (DISCHARGEDELAY * clockspeed)) {}
+    if (timeout) {
+      break;
+    }
   }
 
   uint32_t averageCycles;

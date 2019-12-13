@@ -4,8 +4,8 @@ void handleTrays() {
   if (bitRead(sensorData.systemStatus, STATUS_DRAINING_RESERVOIR) ||
       bitRead(sensorData.systemStatus, STATUS_FILLING_RESERVOIR) ||
       bitRead(sensorData.systemStatus, STATUS_DOOR_OPEN) ||
-      bitRead(sensorData.systemStatus, STATUS_MAINTENANCE || // System is doing something that prevents us from watering,
-      millis() < DRAIN_TIME )) {                            // or we've just started up - wait some time to ensure draining trays have really drained completely.
+      bitRead(sensorData.systemStatus, STATUS_MAINTENANCE) || // System is doing something that prevents us from watering,
+      millis() < DRAIN_TIME ) {                             // or we've just started up - wait some time to ensure draining trays have really drained completely.
     if (bitRead(sensorData.systemStatus, STATUS_WATERING)) {// But we're currently watering! Make sure all pumps are off.
       for (uint8_t tray = 0; tray < TRAYS; tray++) {
         switch (wateringState[tray]) {
@@ -103,7 +103,7 @@ void handleTrays() {
               logging.writeWarning(buff);
               wateringState[tray] = DRAINING;
               wateringTime[tray] = millis();
-              waterFlowSensorTicks[tray] = 0;               // Look for backflow.
+              waterFlowSensorTicks[tray] = 1000;            // Not looking for backflow: we had no flow, so there won't be backflow.
               mcp0.digitalWrite(PUMP_PIN[tray], LOW);       // Switch off the pump.
               //              trayInfo[tray].programState = PROGRAM_ERROR; // Halt operation of this program: an error occurred.
               //              trayInfoChanged = true;
@@ -122,23 +122,23 @@ void handleTrays() {
             wateringState[tray] = DRAINING;
             wateringTime[tray] = millis();
             waterFlowSensorTicks[tray] = 0;                 // Look for backflow.
-            mcp0.digitalWrite(PUMP_PIN[tray], LOW);       // Switch off the pump.
-            trayInfo[tray].programState = PROGRAM_ERROR;  // Halt operation of this program: an error occurred.
+            mcp0.digitalWrite(PUMP_PIN[tray], LOW);         // Switch off the pump.
+            trayInfo[tray].programState = PROGRAM_ERROR;    // Halt operation of this program: an error occurred.
             trayInfoChanged = true;
           }
           break;
 
         case DRAINING:                                      // Watering completed: tray drains for some time.
-//          if (millis() - wateringTime[tray] > 60 * 1000 &&  // After one minute: check for back flow, to detect whether there's water draining.
-//              waterFlowSensorTicks[tray] < 200 &&  // Expect at least 200 ticks on the flow meter.
-//              (trayInfo[tray].programState == PROGRAM_RUNNING ||
-//               trayInfo[tray].programState == PROGRAM_START_WATERING ||
-//               trayInfo[tray].programState == PROGRAM_COMPLETE)) {
-//            sprintf_P(buff, PSTR("Watering 11: Unusually low backflow detected from tray %d. Halting program of this tray, something appears amiss."), tray + 1);
-//            logging.writeError(buff);
-//            trayInfo[tray].programState = PROGRAM_ERROR;    // Halt operation of this program: an error occurred.
-//            trayInfoChanged = true;
-//          }
+          if (millis() - wateringTime[tray] > 60 * 1000 &&  // After one minute: check for back flow, to detect whether there's water draining.
+              waterFlowSensorTicks[tray] < 50 &&            // Expect at least 200 ticks on the flow meter.
+              (trayInfo[tray].programState == PROGRAM_RUNNING ||
+               trayInfo[tray].programState == PROGRAM_START_WATERING ||
+               trayInfo[tray].programState == PROGRAM_COMPLETE)) {
+            sprintf_P(buff, PSTR("Watering 11: Unusually low backflow detected from tray %d. Halting program of this tray, something appears amiss."), tray + 1);
+            logging.writeError(buff);
+            trayInfo[tray].programState = PROGRAM_ERROR;    // Halt operation of this program: an error occurred.
+            trayInfoChanged = true;
+          }
           if (millis() - wateringTime[tray] > DRAIN_TIME) {
             wateringState[tray] = WATERING_IDLE;            // Sequence complete.
             bitClear(sensorData.systemStatus, STATUS_WATERING);

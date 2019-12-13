@@ -256,6 +256,11 @@ void setup() {
   Serial.println(F("Recovery window closed; continuing normal setup."));
 #endif
 
+  // Set up the EEPROM memory (4096 bytes).
+#ifndef USE_24LC256_EEPROM
+  EEPROM.begin(EEPROM_SIZE);
+#endif
+
   fertiliser.begin(&sensorData, &logging, &mcp0);           // Fertiliser pumps.
   pHMinus.begin(&sensorData, &logging, &mcp0);              // pH minus pump.
 #ifdef USE_WATERLEVEL_SENSOR
@@ -264,11 +269,6 @@ void setup() {
 #else
   reservoir.begin(&sensorData, &logging, &mcp0);            // Solenoid valve.
   drainage.begin(&sensorData, &logging, &mcp0);             // Drainage pump & reservoir cleaning.
-#endif
-
-  // Set up the EEPROM memory (4096 bytes).
-#ifndef USE_24LC256_EEPROM
-  EEPROM.begin(EEPROM_SIZE);
 #endif
 
   initSensors();

@@ -22,7 +22,7 @@ Crop getCropData(uint8_t id) {
 
   StaticJsonBuffer<600> jsonBuffer;                         // Create a buffer big enough to contain the complete file.
   JsonObject& root = jsonBuffer.parseObject(json);
-  if (!root.success()) {                                    // Invalid json format.
+  if (!root.success()) {                                     // Invalid json format.
     crop.id = 0;
     return crop;
   }
