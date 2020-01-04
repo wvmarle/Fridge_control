@@ -3,13 +3,13 @@
   /calibrate_ph: calibrate the pH sensor.
 */
 void handleCalibratepH() {
-  network.htmlResponse(&server);
-  network.htmlPageHeader(&server, false);
+  network.htmlResponse();
+  network.htmlPageHeader(false);
   pHSensor.getCalibrationHtml(&server);
-  network.htmlPageFooter(&server);
+  network.htmlPageFooter();
 }
 
 void handleCalibratepHAction() {
   pHSensor.doCalibrationAction(&server);
-  handleCalibratepH();
+  network.redirectTo("/calibrate_ph");
 }

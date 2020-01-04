@@ -19,6 +19,7 @@ void initWebsite() {
   server.on("/calibrate_flowsensors", handleCalibrateFlowsensors);
   server.on("/calibrate_flowsensors_action_start", handleCalibrateFlowsensorsActionStart);
   server.on("/calibrate_flowsensors_action_stop", handleCalibrateFlowsensorsActionStop);
+  server.on("/calibrate_flowsensors_set_manual", handleCalibrateFlowsensorsSetManual);
   server.on("/measure_pump_a_speed", handlePumpASpeed);
   server.on("/measure_pump_b_speed", handlePumpBSpeed);
   server.on("/measure_pump_phminus_speed", handlePumppHMinusSpeed);
@@ -41,8 +42,8 @@ void handleRoot() {
     handleCropProgramRequest();
   }
 
-  network.htmlResponse(&server);
-  network.htmlPageHeader(&server, false);
+  network.htmlResponse();
+  network.htmlPageHeader(false);
   server.sendContent_P(PSTR("<p>Current time: "));
   datetime(buff);
   server.sendContent(buff);
@@ -228,7 +229,7 @@ void handleRoot() {
     <p><a href=\"/settings\">Settings</a></p>\
     <p><a href=\"/calibrate_flowsensors\">Calibrate flow sensors</a></p>\
   </body></html>"));
-  network.htmlPageFooter(&server);
+  network.htmlPageFooter();
 }
 
 void handleCropProgramRequest() {

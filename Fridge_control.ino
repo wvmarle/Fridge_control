@@ -1,5 +1,5 @@
-//#define FRIDGE_A
-#define FRIDGE_B
+#define FRIDGE_A
+//#define FRIDGE_B
 
 #ifdef FRIDGE_A
 #pragma message "Compiling for FRIDGE_A"
@@ -20,7 +20,7 @@
 #include <Adafruit_MCP23017.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
-//#include <DS1603L.h> 
+//#include <DS1603L.h>
 #include <ArduinoJson.h>
 #include <FS.h>
 #include <SoftwareSerial.h>

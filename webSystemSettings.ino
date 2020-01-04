@@ -3,8 +3,8 @@
   /settings: create a page with all the settings of the enabled peripherals.
 */
 void handleSettings() {
-  network.htmlResponse(&server);
-  network.htmlPageHeader(&server, false);
+  network.htmlResponse();
+  network.htmlPageHeader(false);
   server.sendContent_P(PSTR("\
   <form action=\"/set_settings\" method=\"post\">\n\
     <table>\n"));
@@ -22,8 +22,7 @@ void handleSettings() {
     </table>\n\
     <input type=\"submit\" value=\"Save\">\n\
   </form>\n"));
-  network.htmlPageFooter(&server);
-  return;
+  network.htmlPageFooter();
 }
 
 /***********************************************************************************************************
@@ -33,7 +32,7 @@ void handleSetSettings() {
   setSettings();
 
   // Return to the settings page.
-  handleSettings();
+  network.redirectTo("/settings");
 }
 
 void setSettings() {
@@ -50,7 +49,6 @@ void setSettings() {
   parameters.updateSettings(&server);
   drainage.updateSettings(&server);
   reservoir.updateSettings(&server);
-
   for (uint8_t i = 0; i < server.args(); i++) {
     Serial.print(F("Argument: "));
     Serial.print(server.argName(i));
@@ -64,7 +62,7 @@ void setSettings() {
 */
 void handlePumpASpeed() {
   fertiliser.measurePumpA();
-  handleSettings();
+  network.redirectTo("/settings");
 }
 
 /***********************************************************************************************************
@@ -72,7 +70,7 @@ void handlePumpASpeed() {
 */
 void handlePumpBSpeed() {
   fertiliser.measurePumpB();
-  handleSettings();
+  network.redirectTo("/settings");
 }
 
 /***********************************************************************************************************
@@ -80,7 +78,7 @@ void handlePumpBSpeed() {
 */
 void handlePumppHMinusSpeed() {
   pHMinus.measurePump();
-  handleSettings();
+  network.redirectTo("/settings");
 }
 
 /***********************************************************************************************************
@@ -88,7 +86,7 @@ void handlePumppHMinusSpeed() {
 */
 void handleDrainStart() {
   drainage.drainStart();
-  handleSettings();
+  network.redirectTo("/settings");
 }
 
 /***********************************************************************************************************
@@ -96,5 +94,5 @@ void handleDrainStart() {
 */
 void handleDrainStop() {
   drainage.drainStop();
-  handleSettings();
+  network.redirectTo("/settings");
 }

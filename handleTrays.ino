@@ -31,13 +31,15 @@ void handleTrays() {
       // Step 1: check whether this tray requires watering, and if so, set the status accordingly.
       switch (trayInfo[tray].programState) {
         case PROGRAM_START:                                 // A new program: start watering right away.
-          if (bitRead(trayPresence, TRAY_PIN[tray])) {      // Only start the program if the tray is present.
-            wateringState[tray] = WATERING_NEEDED;
-            trayInfo[tray].programState = PROGRAM_START_WATERING; // Doing the initial watering run.
-            wateringTime[tray] = millis();
-            trayInfoChanged = true;
-            sprintf_P(buff, PSTR("Starting program of tray %d."), tray + 1);
-            logging.writeInfo(buff);
+          if (wateringState[tray] == WATERING_IDLE) {       // Make sure the tray is not draining from a previous start!
+            if (bitRead(trayPresence, TRAY_PIN[tray])) {    // Only start the program if the tray is present.
+              wateringState[tray] = WATERING_NEEDED;
+              trayInfo[tray].programState = PROGRAM_START_WATERING; // Doing the initial watering run.
+              wateringTime[tray] = millis();
+              trayInfoChanged = true;
+              sprintf_P(buff, PSTR("Starting program of tray %d."), tray + 1);
+              logging.writeInfo(buff);
+            }
           }
           break;
 

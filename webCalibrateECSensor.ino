@@ -3,14 +3,14 @@
   /calibrate_ec: calibrate the EC sensor.
 */
 void handleCalibrateEC() {
-  network.htmlResponse(&server);
-  network.htmlPageHeader(&server, false);
+  network.htmlResponse();
+  network.htmlPageHeader(false);
   ECSensor.getCalibrationHtml(&server);
-  network.htmlPageFooter(&server);
+  network.htmlPageFooter();
 }
 
 // /calibrate_ec: calibrate the EC sensor.
 void handleCalibrateECAction() {
   ECSensor.doCalibrationAction(&server);
-  handleCalibrateEC();
+  network.redirectTo("/calibrate_ec");
 }

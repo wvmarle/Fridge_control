@@ -1,6 +1,6 @@
 void handleCalibrateFlowsensors() {
-  network.htmlResponse(&server);
-  network.htmlPageHeader(&server, false);
+  network.htmlResponse();
+  network.htmlPageHeader(false);
   server.sendContent_P(PSTR("\
   <h1>Flow sensors calibration.</h1>\n\
   <p></p>\n\
@@ -10,20 +10,22 @@ void handleCalibrateFlowsensors() {
       <th>Action</th>\n\
       <th>Measured pulses</th>\n\
       <th></th>\n\
+      <th>Manual calibration input</th>\n\
+      <th></th>\n\
     </tr>"));
-  for (uint8_t i = 0; i < TRAYS; i++) {
+  for (uint8_t tray = 0; tray < TRAYS; tray++) {
     server.sendContent_P(PSTR("\n\
     <tr>\n\
       <td>"));
-    server.sendContent(itoa(i + 1, buff, 10));
+    server.sendContent(itoa(tray + 1, buff, 10));
     server.sendContent_P(PSTR("</td>"));
 
     bool canCalibrate = false;
     if (bitRead(sensorData.systemStatus, STATUS_RESERVOIR_LEVEL_LOW) == false  // There's enough water in the reservoir
-        && bitRead(trayPresence, TRAY_PIN[i])               // and the tray is present
-        && (trayInfo[i].programState == PROGRAM_UNSET
-            || trayInfo[i].programState  == PROGRAM_SET)    // and there's no program active,
-        && wateringState[i] == WATERING_IDLE) {             // and this tray is not active in watering or draining,
+        && bitRead(trayPresence, TRAY_PIN[tray])            // and the tray is present
+        && (trayInfo[tray].programState == PROGRAM_UNSET
+            || trayInfo[tray].programState  == PROGRAM_SET) // and there's no program active,
+        && wateringState[tray] == WATERING_IDLE) {          // and this tray is not active in watering or draining,
       canCalibrate = true;                                  // We can calibrate this tray.
     }
     if (canCalibrate) {
@@ -31,22 +33,22 @@ void handleCalibrateFlowsensors() {
       <td>\n\
         <form action = \"/calibrate_flowsensors_action_start\">\n\
           <input type=\"hidden\" name=\"flow_sensor\" value = \""));
-      server.sendContent(itoa(i, buff, 10));                // The start button for this tray.
+      server.sendContent(itoa(tray, buff, 10));             // The start button for this tray.
       server.sendContent_P(PSTR("\">\n\
           <input type=\"submit\" value=\"Start\">\n\
         </form>\n\
       </td>\n\
       <td>Pulses: "));
-      server.sendContent(itoa(flowSensorCount[i], buff, 10)); // The current calibration number.
+      server.sendContent(itoa(flowSensorCount[tray], buff, 10)); // The current calibration number.
       server.sendContent_P(PSTR(".</td>\n\
       <td></td>"));
     }
-    else if (wateringState[i] == CALIBRATING) {             // Calibration in progress.
+    else if (wateringState[tray] == CALIBRATING) {          // Calibration in progress.
       server.sendContent_P(PSTR("\n\
       <td>\n\
         <form action = \"/calibrate_flowsensors_action_stop\">\n\
           <input type=\"hidden\" name=\"flow_sensor\" value = \""));
-      server.sendContent(itoa(i, buff, 10));                // The stop button for this tray.
+      server.sendContent(itoa(tray, buff, 10));             // The stop button for this tray.
       server.sendContent_P(PSTR("\">\n\
           <input type=\"submit\" value=\"Stop\">\n\
         </form>\n\
@@ -62,14 +64,14 @@ void handleCalibrateFlowsensors() {
         </form>\n\
       </td>\n\
       <td>Pulses: "));
-      server.sendContent(itoa(flowSensorCount[i], buff, 10)); // The current calibration number.
+      server.sendContent(itoa(flowSensorCount[tray], buff, 10)); // The current calibration number.
       server.sendContent_P(PSTR(".</td>\n\
       <td>"));
-      if (wateringState[i] == DRAINING) {                   // Watering state: draining; can't start calibration now.
+      if (wateringState[tray] == DRAINING) {                // Watering state: draining; can't start calibration now.
         server.sendContent_P(PSTR("\
         Tray draining. Please wait."));
       }
-      else if (bitRead(trayPresence, TRAY_PIN[i]) == false) { // Tray not present.
+      else if (bitRead(trayPresence, TRAY_PIN[tray]) == false) { // Tray not present.
         server.sendContent_P(PSTR("\
         Tray not present."));
       }
@@ -77,19 +79,32 @@ void handleCalibrateFlowsensors() {
         server.sendContent_P(PSTR("\
         Not enough water in the reservoir."));
       }
-      else if (!(trayInfo[i].programState == PROGRAM_UNSET
-                 || trayInfo[i].programState  == PROGRAM_SET)) { // There's a program active.
+      else if (!(trayInfo[tray].programState == PROGRAM_UNSET
+                 || trayInfo[tray].programState  == PROGRAM_SET)) { // There's a program active.
         server.sendContent_P(PSTR("\
         Tray has a crop program running."));
       }
       server.sendContent_P(PSTR("</td>"));
     }
     server.sendContent_P(PSTR("\n\
+    <td>\n\
+        <form action = \"/calibrate_flowsensors_set_manual\">\n\
+          <input type=\"text\" name=\"value\" value=\""));
+    server.sendContent(itoa(flowSensorCount[tray] , buff, 10));
+
+    server.sendContent_P(PSTR("\">\n\
+          <input type=\"hidden\" name=\"flow_sensor\" value = \""));
+    server.sendContent(itoa(tray, buff, 10));             // The manual setting button for this tray.
+    server.sendContent_P(PSTR("\">\n\
+          <input type=\"submit\" value=\"Set\">\n\
+        </form>\n\
+      </td>"));
+    server.sendContent_P(PSTR("\n\
     </tr>"));
   }
   server.sendContent_P(PSTR("\n\
   </table>"));
-  network.htmlPageFooter(&server);
+  network.htmlPageFooter();
 }
 
 void handleCalibrateFlowsensorsActionStart() {
@@ -111,7 +126,7 @@ void handleCalibrateFlowsensorsActionStart() {
     }
   }
   if (APIRequest == false) {
-    handleCalibrateFlowsensors();
+    network.redirectTo("/calibrate_flowsensors");
   }
 }
 
@@ -139,8 +154,37 @@ void handleCalibrateFlowsensorsActionStop() {
     }
   }
   if (APIRequest == false) {
-    handleCalibrateFlowsensors();
+    network.redirectTo("/calibrate_flowsensors");
   }
+}
+
+void handleCalibrateFlowsensorsSetManual() {
+  uint8_t nArgs = server.args();                            // the number of arguments present. All arguments are expected to be key/value pairs.
+  uint8_t tray = TRAYS;
+  uint16_t value = 0;
+  for (uint8_t i = 0; i < nArgs; i++) {                     // Read all the arguments that are present.
+    if (server.argName(i) == F("flow_sensor")) {
+      if (core.isNumeric(server.arg(i))) {
+        tray = server.arg(i).toInt();
+      }
+    }
+    else if (server.argName(i) == F("value")) {
+      if (core.isNumeric(server.arg(i))) {
+        value = server.arg(i).toInt();
+      }
+    }
+  }
+  if (tray < TRAYS &&
+      value > 0 && value < 20000) {
+    flowSensorCount[tray] = value;
+#ifdef USE_24LC256_EEPROM
+    sensorData.EEPROM->put(FLOWSENSOR_COUNT_EEPROM, flowSensorCount);
+#else
+    EEPROM.put(FLOWSENSOR_COUNT_EEPROM, flowSensorCount);
+    EEPROM.commit();
+#endif
+  }
+  network.redirectTo("/calibrate_flowsensors");
 }
 
 /*
