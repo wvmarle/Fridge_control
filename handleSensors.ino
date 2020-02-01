@@ -30,7 +30,8 @@ void initSensors() {
 #endif                                                      // USE_FLOATSWITCHES
 #endif                                                      // USE_WATERLEVEL_SENSOR
 #ifdef USE_DS18B20
-  waterTempSensor.begin(&sensorData, &logging, &ds18b20, &oneWire);
+//  waterTempSensor.begin(&sensorData, &logging, &ds18b20, &oneWire);
+  waterTempSensor.begin(&sensorData, &logging, &ds18b20);
 #elif defined(USE_ISOLATED_SENSOR_BOARD)
   waterTempSensor.begin(&sensorData, &logging);
 #endif

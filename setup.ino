@@ -24,6 +24,7 @@ void setup() {
   sensorData.EEPROM = &EXTERNAL_EEPROM;
 #endif
 
+
 #ifdef HYDROMONITOR_WILLIAMS_FRIDGE_V2_H
   mcp0.digitalWrite(AUX1_MCP17_PIN, HIGH);                  // Reset the port extenders.
   delay(500);

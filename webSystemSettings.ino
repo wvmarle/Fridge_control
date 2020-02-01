@@ -30,8 +30,6 @@ void handleSettings() {
 */
 void handleSetSettings() {
   setSettings();
-
-  // Return to the settings page.
   network.redirectTo("/settings");
 }
 

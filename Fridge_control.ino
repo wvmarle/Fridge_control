@@ -31,6 +31,14 @@ ESP8266WiFiMulti wifiMulti;
 #endif
 //#include <ESP8266mDNS.h>
 
+/***************************************************************************************************
+   HydroMonitor library: various core functions and settings.
+*/
+#include <HydroMonitorCore.h>
+HydroMonitorCore core;
+#include <HydroMonitorGrowingParameters.h>
+HydroMonitorGrowingParameters parameters;
+
 /****************************************************************************************************
    HydroMonitor library: create the sensors and include the various required libraries for them.
 */
@@ -67,13 +75,6 @@ HydroMonitorLogging logging;
 ESP8266WebServer server(80);
 bool APIRequest;                                              // To flag the handler it's coming through the API.
 
-/***************************************************************************************************
-   HydroMonitor library: various core functions and settings.
-*/
-#include <HydroMonitorCore.h>
-HydroMonitorCore core;
-#include <HydroMonitorGrowingParameters.h>
-HydroMonitorGrowingParameters parameters;
 
 // The various variables containing the data from the sensors.
 HydroMonitorCore::SensorData sensorData;
